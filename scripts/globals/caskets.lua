@@ -1030,7 +1030,7 @@ dsp.caskets.onEventFinish = function(player, csid, option, npc)
         -- Inputs
         --------------------------------------------
         elseif lockedChoice == 1 then -- Input a number
-            if inputNumber > 10 and inputNumber < 100 then
+            if inputNumber > 9 and inputNumber < 100 then
                 local splitNumbers = {}
 
                 for digit in string.gmatch(tostring(correctNumber), "%d") do
