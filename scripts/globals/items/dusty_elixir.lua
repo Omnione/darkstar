@@ -49,5 +49,5 @@ function onItemUse(target)
 
     target:addHP(hpAmount)
     target:addMP(mpAmount)
-	target:messageBasic(dsp.msg.basic.RECOVERS_HP_AND_MP)
+    target:messageBasic(dsp.msg.basic.RECOVERS_HP_AND_MP)
 end
