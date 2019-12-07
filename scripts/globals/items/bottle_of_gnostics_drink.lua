@@ -1,8 +1,8 @@
 -----------------------------------------
--- ID: 5393
--- Item: Bottle of Monarch's Drink
--- Item Effect: Regain 30TP/sec 180
--- Duration 3 Mins
+-- ID: 5394
+-- Item: Bottle of Gnostic's Drink
+-- Item Effect: Pax (Enmity Down)
+-- Duration: 3 Mins
 -----------------------------------------
 require("scripts/globals/status")
 require("scripts/globals/msg")
@@ -12,7 +12,7 @@ require("scripts/globals/msg")
 
 function onItemCheck(target)
     local result = 0
-	if target:hasStatusEffect(dsp.effect.MEDICINE) then
+    if target:hasStatusEffect(dsp.effect.MEDICINE) then
         result = 111
     end
     return result
@@ -23,9 +23,9 @@ end
 -----------------------------------------
 
 function onItemUse(target)
-	if (not target:hasStatusEffect(dsp.effect.REGAIN)) then
-		target:addStatusEffect(dsp.effect.REGAIN,3,3,180)
-	else
+    if not target:hasStatusEffect(dsp.effect.PAX) then
+        target:addStatusEffect(dsp.effect.PAX,1,3,60)
+    else
         target:messageBasic(dsp.msg.basic.NO_EFFECT)
     end
 end
