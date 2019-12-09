@@ -14,9 +14,6 @@ function onItemCheck(target)
     if not target:hasPet() then
         result = dsp.msg.basic.REQUIRES_A_PET
     end
-    if target:hasStatusEffect(dsp.effect.MEDICINE) then
-        result = dsp.msg.basic.ITEM_NO_USE_MEDICATED
-    end
     return result
 end
 
@@ -25,9 +22,6 @@ end
 -----------------------------------------
 
 function onItemUse(target)
-    local pet       = target:getPet()
-    local hpAmount  = pet:getMaxHP() - pet:getHP()
-
-    pet:addHP(hpAmount)
-    pet:messageBasic(dsp.msg.basic.RECOVERS_HP,0,hpAmount)
+    local pet = target:getPet()
+    pet:messageBasic(dsp.msg.basic.RECOVERS_HP,0,pet:addHP(pet:getMaxHP()))
 end

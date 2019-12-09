@@ -11,11 +11,7 @@ require("scripts/globals/msg")
 -----------------------------------------
 
 function onItemCheck(target)
-    local result = 0
-	if target:hasStatusEffect(dsp.effect.MEDICINE) then
-        result = 111
-    end
-    return result
+    return 0
 end
 
 -----------------------------------------
@@ -23,9 +19,9 @@ end
 -----------------------------------------
 
 function onItemUse(target)
-	if not target:hasStatusEffect(dsp.effect.REGAIN) then
-		target:addStatusEffect(dsp.effect.REGAIN,3,3,180)
-	else
+    if not target:hasStatusEffect(dsp.effect.REGAIN) then
+        target:addStatusEffect(dsp.effect.REGAIN,3,3,180)
+    else
         target:messageBasic(dsp.msg.basic.NO_EFFECT)
     end
 end

@@ -2103,7 +2103,7 @@ local casketItems =
     },
     [dsp.zone.THE_BOYAHDA_TREE] =
     {
-        regionalItems = {11038, 10948}, -- Carver's Torque | Dragonkin Earring
+        regionalItems = {11038, 10948}, -- Dragonkin Earring | Carver's Torque
         temps =
         {
         ----------------------------------
@@ -3034,7 +3034,7 @@ local casketItems =
     },
     [dsp.zone.THE_SHRINE_OF_RUAVITAU] =
     {
-        regionalItems = {11040, 10951}, -- Weaver's Torque | Terminus Earring
+        regionalItems = {11040, 10951}, -- Terminus Earring | Weaver's Torque
         temps =
         {
         ----------------------------------
@@ -5025,17 +5025,21 @@ end
 ---------------------------------------------------------------------------------------------
 -- Desc: Casket spawn checks, runs through all checks before spawning
 ---------------------------------------------------------------------------------------------
-dsp.caskets.spawnCasket = function (player, mob, x, y, z, r)
-    local chestId     = getCasketID(mob)
-    local npc         = GetNPCByID(chestId)
-    local chestOwner  = player:getLeaderID()
-
-    if chestId == 0 then
+dsp.caskets.spawnCasket = function (mob, player, x, y, z, r)
+    if mob == nil or player == nil then
         return
     end
 
+    local chestId    = getCasketID(mob)
+    local npc        = GetNPCByID(chestId)
+    local chestOwner = player:getLeaderID()
+
+    if chestId == 0 then
+       return
+    end
+
     if dropChance(player) then
-        setCasketData(player, x, y, z, r, npc, chestOwner, mob:getMainLvl())
+       setCasketData(player, x, y, z, r, npc, chestOwner, mob:getMainLvl())
     end
 end
 

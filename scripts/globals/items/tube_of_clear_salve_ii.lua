@@ -1,15 +1,20 @@
 -----------------------------------------
--- ID: 5439
--- Item: Bottle of Vicar's Drink
--- Item Effect: Removes most status ailments AoE
+-- ID: 5838
+-- Item: Tube of Clear Salve II
+-- Item Effect: Removes most status ailments from Pet
 -----------------------------------------
 require("scripts/globals/status")
+require("scripts/globals/msg")
 -----------------------------------------
 -- OnItemCheck
 -----------------------------------------
 
 function onItemCheck(target)
-    return 0
+    local result = 0
+    if not target:hasPet() then
+        result = dsp.msg.basic.REQUIRES_A_PET
+    end
+    return result
 end
 
 -----------------------------------------
@@ -17,6 +22,7 @@ end
 -----------------------------------------
 
 function onItemUse(target)
+    local pet = target:getPet()
     local removedCount = 0
     local removable =
     {
@@ -33,16 +39,16 @@ function onItemUse(target)
         dsp.effect.BLINDNESS
     }
     for _, status in pairs(removable) do
-        if target:hasStatusEffect(status) then
-            target:delStatusEffect(status)
+        if pet:hasStatusEffect(status) then
+            pet:delStatusEffect(status)
             removedCount = removedCount + 1
         end
     end
-    if target:hasStatusEffectByFlag(dsp.effectFlag.ERASABLE) then
-        target:eraseStatusEffect(dsp.effectFlag.ERASABLE)
+    if pet:hasStatusEffectByFlag(dsp.effectFlag.ERASABLE) then
+        pet:eraseStatusEffect(dsp.effectFlag.ERASABLE)
     else
         if removedCount == 0 then
-            target:messageBasic(dsp.msg.basic.NO_EFFECT)
+            pet:messageBasic(dsp.msg.basic.NO_EFFECT)
         end
     end
 end

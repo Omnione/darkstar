@@ -10,11 +10,7 @@ require("scripts/globals/status")
 -----------------------------------------
 
 function onItemCheck(target)
-    local result = 0
-    if target:hasStatusEffect(dsp.effect.MEDICINE) then
-        result = 111
-    end
-    return result
+    return 0
 end
 
 -----------------------------------------

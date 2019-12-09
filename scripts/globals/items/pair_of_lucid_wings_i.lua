@@ -9,11 +9,7 @@ require("scripts/globals/status")
 -----------------------------------------
 
 function onItemCheck(target)
-    local result = 0
-    if target:hasStatusEffect(dsp.effect.MEDICINE) then
-        result = 111
-    end
-    return result
+    return 0
 end
 
 -----------------------------------------
@@ -22,9 +18,7 @@ end
 -- TODO: AOE animation effect.
 
 function onItemUse(target)
-    local party = target:getParty()
-
-    for _, member in pairs(party) do
+    target:forMembersInRange(10, function(member)
         member:addTP(500)
-    end
+    end)
 end
