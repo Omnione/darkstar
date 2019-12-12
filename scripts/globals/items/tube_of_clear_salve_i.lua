@@ -6,8 +6,6 @@
 require("scripts/globals/status")
 require("scripts/globals/msg")
 -----------------------------------------
--- OnItemCheck
------------------------------------------
 
 function onItemCheck(target)
     local result = 0
@@ -19,10 +17,6 @@ function onItemCheck(target)
     end
     return result
 end
-
------------------------------------------
--- OnItemUse
------------------------------------------
 
 function onItemUse(target)
     local pet = target:getPet()

@@ -7,16 +7,10 @@
 require("scripts/globals/status")
 require("scripts/globals/msg")
 -----------------------------------------
--- OnItemCheck
------------------------------------------
 
 function onItemCheck(target)
     return 0
 end
-
------------------------------------------
--- OnItemUse
------------------------------------------
 
 function onItemUse(target)
     if not target:hasStatusEffect(dsp.effect.REGAIN) then

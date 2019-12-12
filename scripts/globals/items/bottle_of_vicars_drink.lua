@@ -4,17 +4,12 @@
 -- Item Effect: Removes most status ailments AoE
 -----------------------------------------
 require("scripts/globals/status")
------------------------------------------
--- OnItemCheck
+require("scripts/globals/msg")
 -----------------------------------------
 
 function onItemCheck(target)
     return 0
 end
-
------------------------------------------
--- OnItemUse
------------------------------------------
 
 function onItemUse(target)
     local removedCount = 0

@@ -7,16 +7,10 @@ require("scripts/globals/settings")
 require("scripts/globals/status")
 require("scripts/globals/msg")
 -----------------------------------------
--- OnItemCheck
------------------------------------------
 
 function onItemCheck(target)
     return 0
 end
-
------------------------------------------
--- OnItemUse
------------------------------------------
 
 function onItemUse(target)
     target:messageBasic(dsp.msg.basic.RECOVERS_HP,0,target:addHP(500*ITEM_POWER))

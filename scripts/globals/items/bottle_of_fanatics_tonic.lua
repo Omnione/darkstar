@@ -6,16 +6,10 @@
 -----------------------------------------
 require("scripts/globals/status")
 -----------------------------------------
--- OnItemCheck
------------------------------------------
 
 function onItemCheck(target)
     return 0
 end
-
------------------------------------------
--- OnItemUse
------------------------------------------
 
 function onItemUse(target)
     target:addStatusEffect(dsp.effect.PHYSICAL_SHIELD, 1, 3, 60)

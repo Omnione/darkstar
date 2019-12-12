@@ -6,18 +6,12 @@
 require("scripts/globals/status")
 require("scripts/globals/msg")
 -----------------------------------------
--- OnItemCheck
------------------------------------------
 
 function onItemCheck(target)
     return 0
 end
 
------------------------------------------
--- OnItemUse
------------------------------------------
 -- TODO: AOE animation effect.
-
 function onItemUse(target)
     target:forMembersInRange(10, function(member)
         member:messageBasic(dsp.msg.basic.RECOVERS_HP,0,member:addHP((member:getMaxHP()/100)*25))

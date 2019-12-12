@@ -11,10 +11,6 @@ function onItemCheck(target)
     return 0
 end
 
------------------------------------------
--- OnItemUse
------------------------------------------
-
 function onItemUse(target)
     local removedCount = 0
     local removable =

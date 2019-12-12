@@ -7,6 +7,7 @@
 -- It can be used on any player, Even those not in your own Party.
 -----------------------------------------
 require("scripts/globals/status")
+require("scripts/globals/msg")
 -----------------------------------------
 
 function onItemCheck(target)
