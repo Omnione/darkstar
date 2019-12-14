@@ -14,7 +14,7 @@ end
 
 function onItemUse(target)
     if not target:hasStatusEffect(dsp.effect.PAX) then
-        target:addStatusEffect(dsp.effect.PAX,1,3,60)
+        target:addStatusEffect(dsp.effect.PAX,-30,3,60)
     else
         target:messageBasic(dsp.msg.basic.NO_EFFECT)
     end
