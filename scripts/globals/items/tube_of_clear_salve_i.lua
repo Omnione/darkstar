@@ -12,9 +12,6 @@ function onItemCheck(target)
     if not target:hasPet() then
         result = dsp.msg.basic.REQUIRES_A_PET
     end
-    if target:hasStatusEffect(dsp.effect.MEDICINE) then
-        result = dsp.msg.basic.ITEM_NO_USE_MEDICATED
-    end
     return result
 end
 

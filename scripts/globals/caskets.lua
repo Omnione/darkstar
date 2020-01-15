@@ -4542,9 +4542,9 @@ local function dropChance(player)
     -----------------------------------------------------------------------------------------
     -- NOTES: 10% base drop rate.
     -- Super Kupowers(Myriad Mystery Boxes) adds 10% drop rate to the base rate.
-    -- GoV Prowess Increased Treasure Casket Discovery adds 5% per level (max 5 levels)
-    -- for a total of 25% increase. -- NOTE this needs to be confirmed!
+    -- GoV Prowess Increased Treasure Casket Discovery adds 1% per level
     -----------------------------------------------------------------------------------------
+    local baseRate = 0.1
     --local kupowerMMBEffect    = player:getStatusEffect(dsp.effect.KUPOWERS_MYRIAD_MYSTERY_BOXES)  -- Super Kupowers Myriad Mystery Boxes not implimented yet.
     local casketProwessEffect = player:getStatusEffect(dsp.effect.PROWESS_CASKET_RATE)
     local kupowersMMBPower    = 0
@@ -4555,12 +4555,12 @@ local function dropChance(player)
     --end
 
     if player:hasStatusEffect(dsp.effect.PROWESS_CASKET_RATE) then
-        prowessCasketsPower = casketProwessEffect:getPower()
+        prowessCasketsPower = casketProwessEffect:getPower() / 1000
     end
 
     local rand = math.random()
 
-    if rand < utils.clamp(CASKET_DROP_RATE + kupowersMMBPower + prowessCasketsPower, 0, 1) then
+    if rand < utils.clamp(baseRate + kupowersMMBPower + prowessCasketsPower, 0, 1) then
         return true
     end
 
