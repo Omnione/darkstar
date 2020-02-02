@@ -1405,6 +1405,19 @@ bool CBattleEntity::OnAttack(CAttackState& state, action_t& action)
     {
         // TODO: Should not be removed by AoE effects that don't target the player.
         PTarget->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_DETECTABLE);
+
+        CCharEntity* PChar = (CCharEntity*)PTarget;
+
+        if (PChar->m_event.Target != nullptr)
+        {
+            if (PChar->m_event.EventID != -1)
+            {
+               // Message: Event skipped
+               PChar->pushPacket(new CMessageSystemPacket(0, 0, 117));
+               PChar->pushPacket(new CReleasePacket(PChar, RELEASE_SKIPPING));
+               PChar->pushPacket(new CReleasePacket(PChar, RELEASE_EVENT));
+            }
+        }
     }
 
     if (battleutils::IsParalyzed(this))
