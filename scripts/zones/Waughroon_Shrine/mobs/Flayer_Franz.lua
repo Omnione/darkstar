@@ -7,6 +7,7 @@ require("scripts/globals/status")
 -----------------------------------
 
 function onMobSpawn(mob)
+    mob:setMobMod(dsp.mobMod.SUPERLINK, mob:getShortID())
     mob:setMobMod(dsp.mobMod.DRAW_IN, 1)
 end
 

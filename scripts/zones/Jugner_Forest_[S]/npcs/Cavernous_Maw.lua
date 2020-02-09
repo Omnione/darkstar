@@ -4,19 +4,30 @@
 -- !pos -118 -8 -520 82
 -- Teleports Players to Jugner Forest
 -----------------------------------
-require("scripts/globals/maws")
+require("scripts/globals/teleports")
+require("scripts/globals/campaign")
+require("scripts/globals/keyitems")
 -----------------------------------
 
 function onTrade(player, npc, trade)
 end
 
 function onTrigger(player, npc)
-    dsp.maws.onTrigger(player, npc)
+    if not hasMawActivated(player, 3) then
+        player:startEvent(101)
+    else
+        player:startEvent(102)
+    end
 end
 
 function onEventUpdate(player, csid, option)
 end
 
 function onEventFinish(player, csid, option)
-    dsp.maws.onEventFinish(player, csid, option)
+    if option == 1 then
+        if csid == 101 then
+            player:addNationTeleport(dsp.teleport.nation.MAW, 8)
+        end
+        dsp.teleport.toMaw(player, 14)
+    end
 end

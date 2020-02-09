@@ -36,7 +36,7 @@ end;
 function onEventFinish(player,csid,option)
 
     if (csid == 24) then
-        player:setCharVar("TheHolyCrest_Event",1);
+        player:setVar("TheHolyCrest_Event",1);
     end
 
 end;

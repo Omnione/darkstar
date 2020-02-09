@@ -11,13 +11,13 @@ require("scripts/globals/quests");
 
 function onTrade(player,npc,trade)
     if (player:getQuestStatus(SANDORIA,dsp.quest.id.sandoria.FLYERS_FOR_REGINE) == QUEST_ACCEPTED) then
-        if (trade:hasItemQty(532,1) and trade:getItemCount() == 1 and player:getCharVar("tradeBlendare") == 0) then
+        if (trade:hasItemQty(532,1) and trade:getItemCount() == 1 and player:getVar("tradeBlendare") == 0) then
             player:messageSpecial(ID.text.BLENDARE_DIALOG);
-            player:addCharVar("FFR", -1)
-            player:setCharVar("tradeBlendare",1);
+            player:addVar("FFR", -1)
+            player:setVar("tradeBlendare",1);
             player:messageSpecial(ID.text.FLYER_ACCEPTED);
             player:tradeComplete();
-        elseif (player:getCharVar("tradeBlendare") ==1) then
+        elseif (player:getVar("tradeBlendare") ==1) then
             player:messageSpecial(ID.text.FLYER_ALREADY);
         end
     end
@@ -34,6 +34,6 @@ end;
 
 function onEventFinish(player,csid,option)
     if (csid == 606) then
-        player:setCharVar("BrothersCS", 1)
+        player:setVar("BrothersCS", 1)
     end
 end;

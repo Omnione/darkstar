@@ -15,7 +15,7 @@ end
 function onTrade(player, npc, trade)
     if npcUtil.tradeHas(trade, 571) and npcUtil.giveItem(player, 570) then
         player:confirmTrade()
-        player:setCharVar("anExplorer-CurrentTablet", 0x00040)
+        player:setVar("anExplorer-CurrentTablet", 0x00040)
     end
 end
 

@@ -4,5 +4,5 @@
 -----------------------------------
 
 function onMobDeath(mob, player, isKiller)
-    player:setCharVar("rootProblem", 3)
+    player:setVar("rootProblem", 3)
 end

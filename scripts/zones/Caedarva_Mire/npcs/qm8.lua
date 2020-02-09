@@ -10,9 +10,9 @@ function onTrade(player,npc,trade)
 end
 
 function onTrigger(player,npc)
-    if player:getCharVar("[TIMER]Lamian_Fang_Key") ~= VanadielDayOfTheYear() then 
+    if player:getVar("[TIMER]Lamian_Fang_Key") ~= VanadielDayOfTheYear() then 
         if npcUtil.giveItem(player, 2219) then
-            player:setCharVar("[TIMER]Lamian_Fang_Key", VanadielDayOfTheYear()) -- Can obtain key once per vanadiel day
+            player:setVar("[TIMER]Lamian_Fang_Key", VanadielDayOfTheYear()) -- Can obtain key once per vanadiel day
         end
     else
         player:messageSpecial(ID.text.NOTHING_OUT_OF_ORDINARY)

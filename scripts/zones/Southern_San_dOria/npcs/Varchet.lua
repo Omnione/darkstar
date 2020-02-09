@@ -23,14 +23,13 @@ function onTrade(player, npc, trade)
         local pdie2 = math.random(1, 6)
         local ptotal = pdie1 + pdie2
 
-        local result = GAME_LOST
         if ptotal > vtotal then
-            result = GAME_WON
+            player:startEvent(519, vdie1, vdie2, vtotal, pdie1, pdie2, ptotal, GAME_WON)
+        elseif vtotal > ptotal then
+            player:startEvent(519, vdie1, vdie2, vtotal, pdie1, pdie2, ptotal, GAME_LOST)
         elseif ptotal == vtotal then
-            result = GAME_TIE
+            player:startEvent(519, vdie1, vdie2, vtotal, pdie1, pdie2, ptotal, GAME_TIE)
         end
-        player:setLocalVar('VarchetGame', result)
-        player:startEvent(519, vdie1, vdie2, vtotal, pdie1, pdie2, ptotal, result)
     else
         player:startEvent(608)
     end
@@ -49,23 +48,21 @@ end
 
 function onEventFinish(player, csid, option)
     if csid == 519 then
-        local result = player:getLocalVar('VarchetGame')
-        if result == GAME_WON then
+        if option == GAME_WON then
             local gilPayout = 10
             player:addGil(gilPayout)
             player:messageSpecial(ID.text.GIL_OBTAINED, gilPayout)
 
             if player:getQuestStatus(SANDORIA, dsp.quest.id.sandoria.EXIT_THE_GAMBLER) == QUEST_ACCEPTED then
-                player:setCharVar("exitTheGamblerStat", 1)
+                player:setVar("exitTheGamblerStat", 1)
                 player:showText(player:getEventTarget(), ID.text.VARCHET_KEEP_PROMISE)
             end
-        elseif result == GAME_TIE then
+        elseif option == GAME_TIE then
             local gilPayout = 5
             player:addGil(gilPayout)
             player:messageSpecial(ID.text.GIL_OBTAINED, gilPayout)
         else
             player:messageSpecial(ID.text.VARCHET_BET_LOST)
         end
-        player:setLocalVar('VarchetGame', 0)
     end
 end

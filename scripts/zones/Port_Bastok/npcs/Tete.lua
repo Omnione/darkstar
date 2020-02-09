@@ -26,7 +26,7 @@ end;
 function onEventFinish(player,csid,option)
 
     if (csid == 175) then
-        player:setCharVar("TheWisdomVar",2);
+        player:setVar("TheWisdomVar",2);
     end
 
 end;

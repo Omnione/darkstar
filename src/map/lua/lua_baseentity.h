@@ -58,9 +58,9 @@ public:
     int32 messageSystem(lua_State*);        // Sends System Message
 
     // Variables
-    int32 getCharVar(lua_State*);           // Returns a character variable
-    int32 setCharVar(lua_State*);           // Sets a character variable
-    int32 addCharVar(lua_State*);           // Increments/decriments/sets a character variable
+    int32 getVar(lua_State*);               // Returns a character variable
+    int32 setVar(lua_State*);               // Sets a character variable
+    int32 addVar(lua_State*);               // Increments/decriments/sets a character variable
     int32 getLocalVar(lua_State*);
     int32 setLocalVar(lua_State*);
     int32 resetLocalVars(lua_State*);
@@ -90,6 +90,7 @@ public:
 
     // Object Identification
     int32 getID(lua_State *L);              // Gets Entity Id
+    int32 getSpellID(lua_State *L);              // Gets Entity Id
     int32 getShortID(lua_State *L);
     int32 getCursorTarget(lua_State *L);    // Returns the ID any object under players in game cursor.
 
@@ -134,6 +135,7 @@ public:
     int32 setWeather(lua_State*);            // Set Weather condition (GM COMMAND)
 
     // PC Instructions
+    int32 setHomePoint(lua_State*);          // Sets character's homepoint
     int32 ChangeMusic(lua_State* L);         // Sets the specified music Track for specified music block.
     int32 sendMenu(lua_State*);              // Displays a menu (AH,Raise,Tractor,MH etc)
     int32 sendGuild(lua_State*);             // Sends guild shop menu
@@ -167,19 +169,14 @@ public:
     int32 setPos(lua_State*);                // Set Entity position (x,y,z,rot) or (x,y,z,rot,zone)
     int32 warp(lua_State*);                  // Returns Character to home point
     int32 teleport(lua_State*);              // Set Entity position (without entity despawn/spawn packets)
-
-    int32 addTeleport(lua_State*);           // Add new teleport means to char unlocks
-    int32 getTeleport(lua_State*);           // Get unlocked teleport means
-    int32 hasTeleport(lua_State*);           // Has access to specific teleport
-    int32 setTeleportMenu(lua_State*);       // Set favorites or menu layout preferences for homepoints or survival guides
-    int32 getTeleportMenu(lua_State*);       // Get favorites and menu layout preferences
-    int32 setHomePoint(lua_State*);          // Sets character's homepoint
-    
     int32 resetPlayer(lua_State*);           // if player is stuck, GM command @resetPlayer name
 
     int32 goToEntity(lua_State*);            // Warps self to NPC or Mob; works across multiple game servers
     int32 gotoPlayer(lua_State*);            // warps self to target player
     int32 bringPlayer(lua_State*);           // warps target to self
+
+    int32 getNationTeleport(lua_State*);     // Get teleport you can use by nation: getNationTeleport(nation)
+    int32 addNationTeleport(lua_State*);     // Add new teleport: addNationTeleport(nation,number)
 
     // Items
     int32 getEquipID(lua_State*);            // Gets the Item Id of the item in specified slot
@@ -379,6 +376,7 @@ public:
 
     // Skills and Abilities
     int32 capSkill(lua_State*);             // Caps the given skill id for the job you're on (GM COMMAND)
+    int32 capAllTrustSkills(lua_State*);         // Caps All skills, GM command
     int32 capAllSkills(lua_State*);         // Caps All skills, GM command
 
     int32 getSkillLevel(lua_State*);        // Get Current Skill Level
@@ -403,18 +401,18 @@ public:
     int32 hasSpell(lua_State*);             // Check to see if character has item in spell list
     int32 canLearnSpell(lua_State*);        // Check to see if character can learn spell, 0 if so
     int32 delSpell(lua_State*);             // Remove spell from Entity spell list
+    int32 getSpellCost(lua_State*);             
 
     int32 recalculateSkillsTable(lua_State*);
     int32 recalculateAbilitiesTable(lua_State*);
 
     // Parties and Alliances
     int32 getParty(lua_State* L);
+    int32 getPartyTrusts(lua_State* L);
     int32 getPartySize(lua_State* L);               // Get the size of a party in an entity's alliance
     int32 hasPartyJob(lua_State*);
     int32 getPartyMember(lua_State* L);             // Get a character entity from another entity's party or alliance
     int32 getPartyLeader(lua_State* L);
-    int32 getLeaderID(lua_State* L);              // Get the id of the alliance/party leader *falls back to player id if no party*
-
     int32 forMembersInRange(lua_State* L);
 
     int32 addPartyEffect(lua_State*);               // Adds Effect to all party members
@@ -495,6 +493,7 @@ public:
     int32 updateEnmityFromCure(lua_State*);
     int32 resetEnmity(lua_State*);             //resets enmity to player for specificed mob
     int32 updateClaim(lua_State*);             // Adds Enmity to player for specified mob and claims
+    int32 hasTopEnmity(lua_State*);
 
     // Status Effects
     int32 addStatusEffect(lua_State*);         // Adds status effect to character
@@ -512,6 +511,7 @@ public:
     int32 delStatusEffectSilent(lua_State*);   // Removes Status Effect, suppresses message
     int32 eraseStatusEffect(lua_State*);       // Used with "Erase" spell
     int32 eraseAllStatusEffect(lua_State*);    // Erases all effects and returns number erased
+    int32 canDispelStatusEffect(lua_State*);      // Check to see if can dispel
     int32 dispelStatusEffect(lua_State*);      // Used with "Dispel" spell
     int32 dispelAllStatusEffect(lua_State*);   // Dispels all effects and returns number erased
     int32 stealStatusEffect(lua_State*);       // Used in mob skills to steal effects
@@ -571,14 +571,18 @@ public:
     int32 getWeaponSkillType(lua_State*);       // gets the type of weapon equipped
     int32 getWeaponSubSkillType(lua_State*);    // gets the subskill of weapon equipped
     int32 getWSSkillchainProp(lua_State* L);    // returns weapon skill's skillchain properties (up to 3)
+    int32 getFormSkillChain(lua_State* L);
+    int32 getLastWsUsed(lua_State* L);
 
     int32 takeWeaponskillDamage(lua_State* L);
-    int32 takeSpellDamage(lua_State* L);
 
     // Pets and Automations
     int32 spawnPet(lua_State*);              // Calls Pet
     int32 despawnPet(lua_State*);            // Despawns Pet
     int32 spawnTrust(lua_State*);            // Spawns trust
+    int32 hasTrust(lua_State*);
+    int32 checkTrust(lua_State*);
+    int32 getTrustWSList(lua_State*);
 
     int32 isJugPet(lua_State*);              // If the entity has a pet, test if it is a jug pet.
     int32 hasValidJugPetItem(lua_State*);
@@ -669,9 +673,13 @@ public:
 
     int32 actionQueueEmpty(lua_State*);     // returns whether the action queue is empty or not
 
+    int32 canCastSpells(lua_State*);
+    int32 startCasting(lua_State*);
+    int32 stopCasting(lua_State*);
     int32 castSpell(lua_State*);            // forces a mob to cast a spell (parameter = spell ID, otherwise picks a spell from its list)
     int32 useJobAbility(lua_State*);        // forces a job ability use (players/pets only)
     int32 useMobAbility(lua_State*);        // forces a mob to use a mobability (parameter = skill ID)
+    int32 useTrustAbility(lua_State*);
     int32 hasTPMoves(lua_State*);
 
     int32 weaknessTrigger(lua_State* L);
@@ -687,6 +695,14 @@ public:
     int32 getDespoilDebuff(lua_State*);     // gets the status effect id to apply to the mob on successful despoil
     int32 itemStolen(lua_State*);           // sets mob's ItemStolen var = true
     int32 getTHlevel(lua_State*);           // Returns the Monster's current Treasure Hunter Tier
+
+    int32 castTrustSpell(lua_State*);
+    int32 getTrustHealSpells(lua_State*);
+    int32 getTrustNaSpells(lua_State*);
+    int32 getTrustDebuffSpells(lua_State*);
+    int32 getTrustBuffSpells(lua_State*);
+    int32 getTrustDamageSpells(lua_State*);
+    int32 getTrustGaSpells(lua_State*);
 };
 
 #endif

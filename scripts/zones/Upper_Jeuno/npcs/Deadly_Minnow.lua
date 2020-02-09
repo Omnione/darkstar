@@ -13,9 +13,9 @@ end
 
 function onTrigger(player,npc)
 
-    if player:getCharVar("BorghertzHandsFirstTime") == 1 then
+    if player:getVar("BorghertzHandsFirstTime") == 1 then
         player:startEvent(24)
-        player:setCharVar("BorghertzHandsFirstTime", 2)
+        player:setVar("BorghertzHandsFirstTime", 2)
     else
         local stock =
         {

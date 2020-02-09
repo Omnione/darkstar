@@ -9,11 +9,11 @@ end
 
 function onTrigger(player,npc)
 
-    local LuckOfTheDraw = player:getCharVar("LuckOfTheDraw")
+    local LuckOfTheDraw = player:getVar("LuckOfTheDraw")
 
     if LuckOfTheDraw ==1 then
         player:startEvent(548)
-        player:setCharVar("LuckOfTheDraw",2)
+        player:setVar("LuckOfTheDraw",2)
     else
         player:startEvent(647)
     end

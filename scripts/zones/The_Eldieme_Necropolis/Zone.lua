@@ -14,7 +14,7 @@ end
 
 function onZoneIn(player,prevZone)
     -- rng af2
-    if player:getCharVar("fireAndBrimstone") == 2 then
+    if player:getVar("fireAndBrimstone") == 2 then
         return 4
     end
 
@@ -39,6 +39,6 @@ end
 
 function onEventFinish(player,csid,option)
     if csid == 4 then
-        player:setCharVar("fireAndBrimstone", 3)
+        player:setVar("fireAndBrimstone", 3)
     end
 end

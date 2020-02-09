@@ -14,7 +14,7 @@ end
 
 function onTrigger(player,npc)
     local OperationTeatime = player:getQuestStatus(AHT_URHGAN,dsp.quest.id.ahtUrhgan.OPERATION_TEATIME)
-    local OperationTeatimeProgress = player:getCharVar("OperationTeatimeProgress")
+    local OperationTeatimeProgress = player:getVar("OperationTeatimeProgress")
 
     if OperationTeatime == QUEST_ACCEPTED and OperationTeatimeProgress == 3 then
         player:startEvent(15)

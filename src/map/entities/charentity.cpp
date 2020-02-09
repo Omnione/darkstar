@@ -44,6 +44,7 @@
 
 #include "../ai/ai_container.h"
 #include "../ai/controllers/player_controller.h"
+#include "../ai/controllers/trust_controller.h"
 #include "../ai/helpers/targetfind.h"
 #include "../ai/states/ability_state.h"
 #include "../ai/states/attack_state.h"
@@ -63,6 +64,7 @@
 #include "../attack.h"
 #include "../utils/attackutils.h"
 #include "../utils/charutils.h"
+#include "../utils/trustutils.h"
 #include "../utils/battleutils.h"
 #include "../item_container.h"
 #include "../items/item_weapon.h"
@@ -116,6 +118,7 @@ CCharEntity::CCharEntity()
     memset(&equip, 0, sizeof(equip));
     memset(&equipLoc, 0, sizeof(equipLoc));
     memset(&RealSkills, 0, sizeof(RealSkills));
+    memset(&nationtp, 0, sizeof(nationtp));
     memset(&expChain, 0, sizeof(expChain));
     memset(&nameflags, 0, sizeof(nameflags));
     memset(&menuConfigFlags, 0, sizeof(menuConfigFlags));
@@ -135,10 +138,6 @@ CCharEntity::CCharEntity()
     memset(&m_missionLog, 0, sizeof(m_missionLog));
     memset(&m_assaultLog, 0, sizeof(m_assaultLog));
     memset(&m_campaignLog, 0, sizeof(m_campaignLog));
-
-    memset(&teleport, 0, sizeof(teleport));
-    memset(&teleport.homepoint.menu, -1, sizeof(teleport.homepoint.menu));
-    memset(&teleport.survival.menu,  -1, sizeof(teleport.survival.menu));
 
     for (uint8 i = 0; i <= 3; ++i)
     {
@@ -198,6 +197,7 @@ CCharEntity::CCharEntity()
     m_PlayTime = 0;
     m_SaveTime = 0;
     m_reloadParty = 0;
+    m_lastWSused = 0;
 
     m_LastYell = 0;
     m_moghouseID = 0;
@@ -474,19 +474,47 @@ bool CCharEntity::ReloadParty()
 
 void CCharEntity::RemoveTrust(CTrustEntity* PTrust)
 {
-    if (!PTrust->PAI->IsSpawned())
+    if (!PTrust)
         return;
 
-    auto trustIt = std::remove_if(PTrusts.begin(), PTrusts.end(), [PTrust](auto trust) { return PTrust == trust; });
-    if (trustIt != PTrusts.end())
+    for (size_t i = 0; i < PTrusts.size(); i++)
     {
-        PTrust->PAI->Despawn();
-        PTrusts.erase(trustIt);
+        if (PTrusts.at(i)->id == PTrust->id)
+        {
+            PTrust->PAI->ClearStateStack();
+            trustutils::DespawnTrust(this, PTrust);
+
+            PTrusts.erase(PTrusts.begin() + i);
+            PTrust->PMaster = nullptr;
+            break;
+        }
     }
+
     if (PParty != nullptr)
     {
-        PParty->ReloadParty();
+        if (PParty->members.size() == 1 && PTrusts.size() == 0)
+        {
+            SpawnTRUSTList.clear();
+            PParty->DisbandParty();
+            PParty = nullptr;
+        }
+        else
+        {
+            PParty->ReloadParty();
+        }
     }
+}
+
+uint8 CCharEntity::TrustPartyPosition(CTrustEntity* PTrust)
+{
+    for (uint8 i = 0; i < PTrusts.size(); i++)
+    {
+        if (PTrusts.at(i)->id == PTrust->id)
+        {
+            return i;
+        }
+    }
+    return 0;
 }
 
 void CCharEntity::ClearTrusts()
@@ -496,12 +524,17 @@ void CCharEntity::ClearTrusts()
         return;
     }
 
-    for (auto trust : PTrusts)
+    for (size_t i = 0; i < PTrusts.size(); i++)// auto trust : PTrusts)
     {
-        trust->PAI->Despawn();
+        auto trust = (PTrusts.at(i));
+        RemoveTrust(trust);
+        i--;
     }
+
     PTrusts.clear();
+    SpawnTRUSTList.clear();
 }
+
 
 void CCharEntity::Tick(time_point tick)
 {
@@ -678,6 +711,20 @@ bool CCharEntity::OnAttack(CAttackState& state, action_t& action)
     auto ret = CBattleEntity::OnAttack(state, action);
 
     auto PTarget = static_cast<CBattleEntity*>(state.GetTarget());
+
+    if (ret && PTrusts.size() > 0)
+    {
+        for each (auto trust in PTrusts)
+        {
+            if (!trust->PAI->IsEngaged())
+            {
+                CTrustController* controller = (CTrustController*)trust->PAI->GetController();
+
+                controller->Engage(PTarget->targid);
+                controller->TTarget = PTarget;
+            }
+        }
+    }
 
     if (PTarget->isDead())
     {
@@ -893,13 +940,14 @@ void CCharEntity::OnWeaponSkillFinished(CWeaponSkillState& state, action_t& acti
                         }
                     }
                     // check for ws points
-                    if (charutils::CheckMob(this->GetMLevel(), PTarget->GetMLevel()) > EMobDifficulty::TooWeak)
+                    if (charutils::GetRealExp(this->GetMLevel(), PTarget->GetMLevel()) > 0)
                     {
                         charutils::AddWeaponSkillPoints(this, damslot, wspoints);
                     }
                 }
             }
         }
+        m_lastWSused = PWeaponSkill->getID();
     }
     else
     {
@@ -1494,13 +1542,7 @@ void CCharEntity::OnRaise()
         auto& actionTarget = list.getNewActionTarget();
 
         list.ActionTargetID = id;
-        // Mijin Gakure used with MIJIN_RERAISE MOD
-        if (GetLocalVar("MijinGakure") != 0 && getMod(Mod::MIJIN_RERAISE) != 0)
-        {
-            actionTarget.animation = 511;
-            hpReturned = (uint16)(GetMaxHP());
-        }
-        else if (m_hasRaise == 1)
+        if (m_hasRaise == 1)
         {
             actionTarget.animation = 511;
             hpReturned = (uint16)((GetLocalVar("MijinGakure") != 0) ? GetMaxHP() * 0.5 : GetMaxHP() * 0.1);
@@ -1572,7 +1614,6 @@ void CCharEntity::OnItemFinish(CItemState& state, action_t& action)
 
     action.id = this->id;
     action.actiontype = ACTION_ITEM_FINISH;
-    action.actionid = PItem->getID();
 
     actionList_t& actionList = action.getNewActionList();
     actionList.ActionTargetID = PTarget->id;
@@ -1629,16 +1670,9 @@ CBattleEntity* CCharEntity::IsValidTarget(uint16 targid, uint16 validTargetFlags
             // Interaction was blocked
             static_cast<CCharEntity*>(PTarget)->pushPacket(new CMessageSystemPacket(0, 0, 226));
         }
-        else if (static_cast<CCharEntity*>(this)->IsMobOwner(PTarget))
+        else if (PTarget->objtype == TYPE_TRUST || static_cast<CCharEntity*>(this)->IsMobOwner(PTarget))
         {
-            if (PTarget->isAlive() || (validTargetFlags & TARGET_PLAYER_DEAD) != 0)
-            {
-                return PTarget;
-            }
-            else
-            {
-                errMsg = std::make_unique<CMessageBasicPacket>(this, this, 0, 0, MSGBASIC_CANNOT_ON_THAT_TARG);
-            }
+            return PTarget;
         }
         else
         {
@@ -1672,6 +1706,21 @@ void CCharEntity::Die()
         float retainPercent = std::clamp(map_config.exp_retain + getMod(Mod::EXPERIENCE_RETAINED) / 100.0f, 0.0f, 1.0f);
         charutils::DelExperiencePoints(this, retainPercent, 0);
     }
+    if (PTrusts.size() > 0)
+    {
+        ClearTrusts();
+        if (PParty != nullptr)
+        {
+            if (PParty->members.size() == 1 && PTrusts.size() == 0)
+            {
+                PParty->DisbandParty();
+            }
+            else
+            {
+                PParty->ReloadParty();
+            }
+        }
+    }
 }
 
 void CCharEntity::Die(duration _duration)
@@ -1689,10 +1738,6 @@ void CCharEntity::Die(duration _duration)
 
     if (this->getMod(Mod::RERAISE_III) > 0)
         m_hasRaise = 3;
-    // MIJIN_RERAISE checks
-    if (m_hasRaise == 0 && this->getMod(Mod::MIJIN_RERAISE) > 0)
-        m_hasRaise = 1;
-
     CBattleEntity::Die();
 }
 

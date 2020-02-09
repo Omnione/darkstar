@@ -335,7 +335,7 @@ function npcUtil.completeQuest(player, area, quest, params)
             table.insert(playerVarsToZero, params["var"])
         end
         for _, v in pairs(playerVarsToZero) do
-            player:setCharVar(v, 0)
+            player:setVar(v, 0)
         end
     end
 

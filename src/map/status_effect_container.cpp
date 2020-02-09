@@ -198,18 +198,8 @@ bool CStatusEffectContainer::CanGainStatusEffect(CStatusEffect* PStatusEffect)
         case EFFECT_SLEEP:
         case EFFECT_SLEEP_II:
         case EFFECT_LULLABY:
-        {
-            if (m_POwner->hasImmunity(IMMUNITY_SLEEP))
-                return false;
-
-            uint16 subPower = PStatusEffect->GetSubPower();
-            if (subPower == ELEMENT_LIGHT && m_POwner->hasImmunity(IMMUNITY_LIGHT_SLEEP))
-                return false;
-            if (subPower == ELEMENT_DARK && m_POwner->hasImmunity(IMMUNITY_DARK_SLEEP))
-                return false;
-
+            if (m_POwner->hasImmunity(IMMUNITY_SLEEP)) return false;
             break;
-        }
         case EFFECT_WEIGHT:
             if (m_POwner->hasImmunity(IMMUNITY_GRAVITY)) return false;
             break;
@@ -725,6 +715,27 @@ uint8 CStatusEffectContainer::EraseAllStatusEffect()
     }
     return count;
 }
+
+
+bool CStatusEffectContainer::CanDispelStatusEffect(EFFECTFLAG flag)
+{
+    std::vector<uint16> dispelableList;
+    for (uint16 i = 0; i < m_StatusEffectList.size(); ++i)
+    {
+        if (m_StatusEffectList.at(i)->GetFlag() & flag &&
+            m_StatusEffectList.at(i)->GetDuration() > 0 &&
+            !m_StatusEffectList.at(i)->deleted)
+        {
+            dispelableList.push_back(i);
+        }
+    }
+    if (!dispelableList.empty())
+    {
+        return true;
+    }
+    return false;
+}
+
 
 /************************************************************************
 *                                                                       *
@@ -1375,7 +1386,7 @@ void CStatusEffectContainer::SaveStatusEffects(bool logout)
         auto realduration = std::chrono::milliseconds(PStatusEffect->GetDuration()) +
             PStatusEffect->GetStartTime() - server_clock::now();
 
-        if (realduration > 0s || PStatusEffect->GetDuration() == 0)
+        if (realduration > 0s)
         {
             const char* Query = "INSERT INTO char_effects (charid, effectid, icon, power, tick, duration, subid, subpower, tier, flags, timestamp) VALUES(%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u);";
 

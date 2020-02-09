@@ -12,7 +12,7 @@ require("scripts/globals/quests");
 function onTrade(player,npc,trade)
 
     if (trade:hasItemQty(13315,1) and trade:getItemCount() == 1) then -- Trade gold earring (during Rng AF3 quest)
-        local UnbridledPassionCS = player:getCharVar("unbridledPassion");
+        local UnbridledPassionCS = player:getVar("unbridledPassion");
         if (UnbridledPassionCS == 2) then
             player:startEvent(10011);
         end
@@ -22,8 +22,8 @@ end;
 
 function onTrigger(player,npc)
 
-    local FireAndBrimstoneCS = player:getCharVar("fireAndBrimstone");
-    local UnbridledPassionCS = player:getCharVar("unbridledPassion");
+    local FireAndBrimstoneCS = player:getVar("fireAndBrimstone");
+    local UnbridledPassionCS = player:getVar("unbridledPassion");
 
     -- during RNG af2
     if (FireAndBrimstoneCS == 1) then
@@ -48,13 +48,13 @@ end;
 function onEventFinish(player,csid,option)
     if (csid == 10007) then
         player:startEvent(10032);
-        player:setCharVar("fireAndBrimstone",2);
+        player:setVar("fireAndBrimstone",2);
     elseif (csid == 10009) then
-        player:setCharVar("unbridledPassion",2);
+        player:setVar("unbridledPassion",2);
     elseif (csid == 10011) then
         player:addKeyItem(dsp.ki.KOHS_LETTER);
         player:messageSpecial(ID.text.KEYITEM_OBTAINED,dsp.ki.KOHS_LETTER);
         player:tradeComplete();
-        player:setCharVar("unbridledPassion",3);
+        player:setVar("unbridledPassion",3);
     end
 end;

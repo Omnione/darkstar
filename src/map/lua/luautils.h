@@ -33,6 +33,7 @@
 #include "lua_ability.h"
 #include "lua_baseentity.h"
 #include "lua_mobskill.h"
+#include "lua_trustskill.h"
 #include "lua_action.h"
 #include "lua_battlefield.h"
 #include "lua_instance.h"
@@ -221,7 +222,6 @@ namespace luautils
 
     int32 OnMobInitialize(CBaseEntity* PMob);                                     // Used for passive trait
     int32 ApplyMixins(CBaseEntity* PMob);
-    int32 ApplyZoneMixins(CBaseEntity* PMob);
     int32 OnMobSpawn(CBaseEntity* PMob);                                          // triggers on mob spawn
     int32 OnMobRoamAction(CBaseEntity* PMob);                                     // triggers when event mob is ready for a custom roam action
     int32 OnMobRoam(CBaseEntity* PMob);
@@ -239,7 +239,7 @@ namespace luautils
     int32 OnBattlefieldInitialise(CBattlefield* PBattlefield);                    // what to do when initialising battlefield, battlefield:setLocalVar("lootId") here for any which have loot
     int32 OnBattlefieldTick(CBattlefield* PBattlefield);
     int32 OnBattlefieldStatusChange(CBattlefield* PBattlefield);
-
+    
     int32 OnBattlefieldEnter(CCharEntity* PChar, CBattlefield* PBattlefield);        // triggers when enter a bcnm
     int32 OnBattlefieldLeave(CCharEntity* PChar, CBattlefield* PBattlefield, uint8 LeaveCode); // see battlefield.h BATTLEFIELD_LEAVE_CODE
 
@@ -287,6 +287,21 @@ namespace luautils
 
     void OnFurniturePlaced(CCharEntity* PChar, CItemFurnishing* itemId);
     void OnFurnitureRemoved(CCharEntity* PChar, CItemFurnishing* itemId);
+
+    int32 OnTrustSpawn(CBaseEntity* PTrust);                                                                                             
+    int32 OnTrustDeath(CBaseEntity* PTrust);                 
+    int32 OnTrustDespawn(CBaseEntity* PTrust);
+
+    int32 OnTrustEngaged(CBaseEntity* PTrust, CBaseEntity* PTarget);
+    int32 OnTrustFight(CBaseEntity* PTrust, CBaseEntity* PTarget);
+    int32 OnTrustDisengage(CBaseEntity* PTrust);
+
+    int32 OnTrustSpellCheck(CBaseEntity* PTarget, CBattleEntity* PTrust, CSpell* PSpell);                           // triggered just before casting a spell
+    std::tuple<uint16, uint16> OnTrustCast(CBattleEntity* PTrust);
+
+    int32 OnTrustWeaponSkillCheck(CBaseEntity* PChar, CBaseEntity* PTrust, CMobSkill* PMobSkill);
+    int32 OnTrustSkillCheck(CBaseEntity* PChar, CBaseEntity* PTrust, CAbility* PMobSkill);
+    int32 OnTrustWeaponSkill(CBaseEntity* PChar, CBaseEntity* PTrust, CMobSkill* PMobSkill);
 };
 
 #endif //- _LUAUTILS_H -

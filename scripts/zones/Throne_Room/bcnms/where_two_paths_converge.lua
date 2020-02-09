@@ -11,11 +11,6 @@ function onBattlefieldTick(battlefield, tick)
     dsp.battlefield.onBattlefieldTick(battlefield, tick)
 end
 
-function onBattlefieldInitialise(battlefield)
-    battlefield:setLocalVar("loot", 1)
-    battlefield:setLocalVar("lootSpawned", 1)
-end
-
 function onBattlefieldRegister(player, battlefield)
 end
 
@@ -36,5 +31,5 @@ function onEventUpdate(player, csid, option)
 end
 
 function onEventFinish(player, csid, option)
-    player:setCharVar("MissionStatus", 2) -- This should be MissionStatus..But all battlefields of same var need updated.
+    player:setVar("BASTOK92", 2) -- This should be MissionStatus..But all battlefields of same var need updated.
 end

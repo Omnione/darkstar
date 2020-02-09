@@ -20,10 +20,10 @@ end
 function onBattlefieldLeave(player, battlefield, leavecode)
     if leavecode == dsp.battlefield.leaveCode.WON then
         local name, clearTime, partySize = battlefield:getRecord()
-        local arg8 = (player:getQuestStatus(SANDORIA, dsp.quest.id.sandoria.TRIAL_SIZE_TRIAL_BY_ICE) == QUEST_COMPLETED) and 1 or 0
+        local arg8 = (player:getQuestStatus(SANDORIA, dsp.quest.id.otherAreas.TRIAL_SIZE_TRIAL_BY_ICE) == QUEST_COMPLETED) and 1 or 0
         player:startEvent(32001, battlefield:getArea(), clearTime, partySize, battlefield:getTimeInside(), 1, battlefield:getLocalVar("[cs]bit"), arg8)
     elseif leavecode == dsp.battlefield.leaveCode.LOST then
-        player:setCharVar("TrialSizeIce_date", tonumber(os.date("%j"))) -- If you lose, you need to wait 1 real day
+        player:setVar("TrialSizeIce_date", tonumber(os.date("%j"))) -- If you lose, you need to wait 1 real day
         player:startEvent(32002)
     end
 end
@@ -41,7 +41,7 @@ function onEventFinish(player, csid, option)
             player:addItem(4181) -- Scroll of instant warp
             player:messageSpecial(ID.text.ITEM_OBTAINED, 4181)
         end
-        player:setCharVar("TrialSizeIce_date", 0)
+        player:setVar("TrialSizeIce_date", 0)
         player:addFame(SANDORIA, 30)
         player:completeQuest(SANDORIA, dsp.quest.id.sandoria.TRIAL_SIZE_TRIAL_BY_ICE)
     end

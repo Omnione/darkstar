@@ -14,10 +14,10 @@ end;
 function onTrigger(player,npc)
 
     local TheWaywardAutomation = player:getQuestStatus(AHT_URHGAN,dsp.quest.id.ahtUrhgan.THE_WAYWARD_AUTOMATION);
-    local TheWaywardAutomationProgress = player:getCharVar("TheWaywardAutomationProgress");
+    local TheWaywardAutomationProgress = player:getVar("TheWaywardAutomationProgress");
     local OperationTeatime = player:getQuestStatus(AHT_URHGAN,dsp.quest.id.ahtUrhgan.OPERATION_TEATIME);
-    local OperationTeatimeProgress = player:getCharVar("OperationTeatimeProgress");
-    local OTT_DayWait = player:getCharVar("OTT_DayWait");
+    local OperationTeatimeProgress = player:getVar("OperationTeatimeProgress");
+    local OTT_DayWait = player:getVar("OTT_DayWait");
     local Gameday = VanadielDayOfTheYear();
 
     -- Quest: The WayWard Automation
@@ -41,11 +41,11 @@ end;
 function onEventFinish(player,csid,option)
 
     if (csid == 289) then
-        player:setCharVar("TheWaywardAutomationProgress",2);
+        player:setVar("TheWaywardAutomationProgress",2);
     elseif (csid == 290 and option == 0) then
-        player:setCharVar("OTT_DayWait", VanadielDayOfTheYear());
+        player:setVar("OTT_DayWait", VanadielDayOfTheYear());
     elseif (csid == 290 and option == 1) then
-        player:setCharVar("OperationTeatimeProgress",3)
-        player:setCharVar("OTT_DayWait",0)
+        player:setVar("OperationTeatimeProgress",3)
+        player:setVar("OTT_DayWait",0)
     end
 end;

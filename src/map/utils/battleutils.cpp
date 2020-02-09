@@ -55,8 +55,10 @@
 #include "../trait.h"
 #include "../weapon_skill.h"
 #include "../mobskill.h"
+#include "../trust_weaponskill.h"
 #include "../entities/battleentity.h"
 #include "../entities/mobentity.h"
+#include "../entities/trustentity.h"
 #include "../entities/petentity.h"
 #include "../enmity_container.h"
 #include "../items.h"
@@ -85,9 +87,14 @@ std::array<std::array<uint16, MAX_SKILLCHAIN_COUNT + 1>, MAX_SKILLCHAIN_LEVEL + 
 
 std::array<CWeaponSkill*, MAX_WEAPONSKILL_ID> g_PWeaponSkillList;           // Holds all Weapon skills
 std::array<CMobSkill*, 4096> g_PMobSkillList;                   // List of mob skills
+std::array<CTrustWeaponSkill*, 4096> g_PTrustWeaponSkillList;
+std::array<CTrustWeaponSkill*, 4096> g_PTrustAbilityList;
 
 std::array<std::list<CWeaponSkill*>, MAX_SKILLTYPE> g_PWeaponSkillsList;
+
 std::unordered_map<uint16, std::vector<uint16>>  g_PMobSkillLists;  // List of mob skills defined from mob_skill_lists.sql
+std::unordered_map<uint16, std::vector<uint16>>  g_PTrustWeaponSkillLists;  // List of mob skills defined from mob_skill_lists.sql
+std::unordered_map<uint16, std::vector<uint16>>  g_PTrustAbilityLists;  // List of mob skills defined from mob_skill_lists.sql
 
 /************************************************************************
 *  battleutils                                                          *
@@ -242,6 +249,34 @@ namespace battleutils
         }
     }
 
+    void LoadTrustWeaponSkillsList()
+    {
+        const char* specialQuery = "SELECT weaponskillid, animation, name, aoe, \
+        `range`, animationTime, primary_sc, secondary_sc, tertiary_sc \
+        FROM weapon_skills;";
+
+        int32 ret = Sql_Query(SqlHandle, specialQuery);
+
+        if (ret != SQL_ERROR && Sql_NumRows(SqlHandle) != 0)
+        {
+            while (Sql_NextRow(SqlHandle) == SQL_SUCCESS)
+            {
+                CTrustWeaponSkill* PTrustWeaponSkill = new CTrustWeaponSkill(Sql_GetIntData(SqlHandle, 0));
+                PTrustWeaponSkill->setAnimationID(Sql_GetIntData(SqlHandle, 1));
+                PTrustWeaponSkill->setName(Sql_GetData(SqlHandle, 2));
+                PTrustWeaponSkill->setAoe(Sql_GetIntData(SqlHandle, 3));
+                PTrustWeaponSkill->setDistance(Sql_GetFloatData(SqlHandle, 4));
+                PTrustWeaponSkill->setAnimationTime(std::chrono::milliseconds(Sql_GetUIntData(SqlHandle, 5)));
+                PTrustWeaponSkill->setValidTargets(4);
+                PTrustWeaponSkill->setPrimarySkillchain(Sql_GetUIntData(SqlHandle, 6));
+                PTrustWeaponSkill->setSecondarySkillchain(Sql_GetUIntData(SqlHandle, 7));
+                PTrustWeaponSkill->setTertiarySkillchain(Sql_GetUIntData(SqlHandle, 8));
+                PTrustWeaponSkill->setMsg(185); //standard damage message. Scripters will change this.
+                g_PTrustWeaponSkillList[PTrustWeaponSkill->getID()] = PTrustWeaponSkill;
+            }
+        }
+    }
+
     void LoadSkillChainDamageModifiers()
     {
         const char* fmtQuery = "SELECT chain_level, chain_count, initial_modifier, magic_burst_modifier \
@@ -333,6 +368,22 @@ namespace battleutils
         return false;
     }
 
+    bool CanUseWeaponskill(CTrustEntity* PTrust, CWeaponSkill* PSkill)
+    {
+        if (PSkill->getSkillLevel() > 0)
+        {
+            if (PTrust->GetSkill(PSkill->getType()) >= PSkill->getSkillLevel())
+            {
+                if (PSkill->getJob(PTrust->GetMJob()) > 0 ||
+                   (PSkill->getJob(PTrust->GetSJob()) > 0 && !PSkill->mainOnly()))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /************************************************************************
     *                                                                       *
     *  Get Enmity Modifier                                                  *
@@ -402,6 +453,18 @@ namespace battleutils
         }
     }
 
+    CTrustWeaponSkill* GetTrustWeaponSkill(uint16 SkillID)
+    {
+        if (SkillID < g_PTrustWeaponSkillList.size())
+        {
+            return g_PTrustWeaponSkillList[SkillID];
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
     /************************************************************************
     *                                                                       *
     *  Get Mob Skills by list id                                          *
@@ -413,6 +476,11 @@ namespace battleutils
         return g_PMobSkillLists[ListID];
     }
 
+    const std::vector<uint16>& GetTrustWeaponSkillList(uint16 ListID)
+    {
+        return g_PTrustWeaponSkillLists[ListID];
+    }
+
     int32 CalculateEnspellDamage(CBattleEntity* PAttacker, CBattleEntity* PDefender, uint8 Tier, uint8 element) {
         int32 damage = 0;
 
@@ -420,9 +488,6 @@ namespace battleutils
         if (Tier == 1)
         {
             damage = PAttacker->getMod(Mod::ENSPELL_DMG) + PAttacker->getMod(Mod::ENSPELL_DMG_BONUS);
-            auto PChar = dynamic_cast<CCharEntity *>(PAttacker);
-            if (PChar)
-                damage += PChar->PMeritPoints->GetMeritValue(MERIT_ENSPELL_DAMAGE, PChar);
         }
         else if (Tier == 2)
         {
@@ -449,10 +514,6 @@ namespace battleutils
                 damage = PAttacker->getMod(Mod::ENSPELL_DMG) - 1;
             }
             damage += PAttacker->getMod(Mod::ENSPELL_DMG_BONUS);
-
-            auto PChar = dynamic_cast<CCharEntity *>(PAttacker);
-            if (PChar)
-                damage += PChar->PMeritPoints->GetMeritValue(MERIT_ENSPELL_DAMAGE, PChar) * 2;
         }
         else if (Tier == 3) //enlight or endark
         {
@@ -2185,32 +2246,6 @@ namespace battleutils
         return damage;
     }
 
-
-    /************************************************************************
-    *                                                                       *
-    *  Handles Damage from Spells (dmg type reductions calced in lua)       *
-    *                                                                       *
-    ************************************************************************/
-
-    int32 TakeSpellDamage(CBattleEntity* PDefender, CCharEntity* PAttacker, CSpell* PSpell, int32 damage, ATTACKTYPE attackType, DAMAGETYPE damageType)
-    {
-        PDefender->takeDamage(damage, PAttacker, attackType, damageType);
-
-        // Remove effects from damage
-        if (PSpell->canTargetEnemy() && damage > 0 && PSpell->dealsDamage())
-        {
-            PDefender->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_DAMAGE);
-            // Check for bind breaking
-            BindBreakCheck(PAttacker, PDefender);
-
-            // Do we get TP for damaging spells?
-            int16 tp = battleutils::CalculateSpellTP(PAttacker, PSpell);
-            PAttacker->addTP(tp);
-        }
-
-        return damage;
-    }
-
     /************************************************************************
     *                                                                       *
     *  Calculate Probability attack will hit (20% min cap - 95% max cap)    *
@@ -3122,14 +3157,6 @@ namespace battleutils
             * (100 + PAttacker->getMod(Mod::SKILLCHAINBONUS)) / 100
             * (100 + PAttacker->getMod(Mod::SKILLCHAINDMG)) / 100);
 
-        auto PChar = dynamic_cast<CCharEntity *>(PAttacker);
-        if (PChar && PChar->StatusEffectContainer->HasStatusEffect(EFFECT_INNIN))
-        {
-            auto angle = PDefender->loc.p.rotation - getangle(PDefender->loc.p, PChar->loc.p);
-            // assuming default tolerance of 42 from lua_baseentity.cpp
-            if (angle > 86 && angle < 170)
-                damage = (int32)(damage * (1.f + PChar->PMeritPoints->GetMeritValue(MERIT_INNIN_EFFECT, PChar)/100.f));
-        }
         damage = damage * (1000 - resistance) / 1000;
         damage = MagicDmgTaken(PDefender, damage, appliedEle);
         if (damage > 0)
@@ -3197,6 +3224,11 @@ namespace battleutils
         {
             return (((CCharEntity*)PEntity)->getEquip(Slot));
         }
+        else if (PEntity->objtype == TYPE_NPC)
+        {
+            return nullptr;
+        }
+
         return nullptr;
     }
 
@@ -3675,6 +3707,9 @@ namespace battleutils
         return shotCount;
     }
 
+
+
+
     /************************************************************************
     *                                                                       *
     *   Jump DRG Job ability                                                *
@@ -3847,69 +3882,65 @@ namespace battleutils
         //Tough             1.5 Minutes
         //VT                1 minute    guess
         //IT                30 seconds  guess
+
         uint32 CharmTime = 0;
 
         // player charming mob
-        CMobEntity* PMob = dynamic_cast<CMobEntity*>(PVictim);
-        if (PMob && PCharmer->objtype == TYPE_PC)
+        if (PVictim->objtype == TYPE_MOB && PCharmer->objtype == TYPE_PC)
         {
             // cannot charm NM
-            if (PMob->m_Type & MOBTYPE_NOTORIOUS)
+            if (((CMobEntity*)PVictim)->m_Type & MOBTYPE_NOTORIOUS) {
                 return;
+            }
 
-            // Bind uncharmable mobs for 5 seconds
-            if (!PMob->getMobMod(MOBMOD_CHARMABLE) ||  PMob->PMaster)
-            {
-                PVictim->StatusEffectContainer->AddStatusEffect(new CStatusEffect(EFFECT_BIND, EFFECT_BIND, 1, 0, dsprand::GetRandomNumber(1, 5)));
+            //Bind uncharmable mobs for 5 seconds
+            if ( ((CMobEntity*)PVictim)->getMobMod(MOBMOD_CHARMABLE) == 0 ||  PVictim->PMaster != nullptr) {
+                PVictim->StatusEffectContainer->AddStatusEffect(
+                    new CStatusEffect(EFFECT_BIND, EFFECT_BIND, 1, 0, dsprand::GetRandomNumber(1, 5)));
                 return;
             }
 
             // mob is charmable
-            const EMobDifficulty mobCheck = charutils::CheckMob(PCharmer->GetMLevel(), PVictim->GetMLevel());
-            switch (mobCheck)
-            {
-            case EMobDifficulty::TooWeak:
-                CharmTime = 1800000;
-                break;
+            uint16 baseExp = charutils::GetRealExp(PCharmer->GetMLevel(), PVictim->GetMLevel());
 
-            case EMobDifficulty::IncredibyEasyPrey:
-            case EMobDifficulty::EasyPrey:
-                CharmTime = 1200000;
-                break;
-
-            case EMobDifficulty::DecentChallenge:
-                CharmTime = 600000;
-                break;
-
-            case EMobDifficulty::EvenMatch:
-                CharmTime = 180000;
-                break;
-
-            case EMobDifficulty::Tough:
-                CharmTime = 90000;
-                break;
-
-            case EMobDifficulty::VeryTough:
-                CharmTime = 45000;
-                break;
-
-            case EMobDifficulty::IncrediblyTough:
+            if (baseExp >= 400) {//IT
                 CharmTime = 22500;
-                break;
+            }
+            else if (baseExp >= 240) {//VT
+                CharmTime = 45000;
+            }
+            else if (baseExp >= 120) {//T
+                CharmTime = 90000;
+            }
+            else if (baseExp == 100) {//EM
+                CharmTime = 180000;
+            }
+            else if (baseExp >= 75) {//DC
+                CharmTime = 600000;
+            }
+            else if (baseExp >= 15) {//EP
+                CharmTime = 1200000;
+            }
+            else if (baseExp == 0) {//TW
+                CharmTime = 1800000;
             }
 
             //apply charm time extension from gear
             uint16 charmModValue = (PCharmer->getMod(Mod::CHARM_TIME));
             // adds 5% increase
-            uint32 extraCharmTime = (uint32)(CharmTime * (charmModValue * 0.5f) / 10.f);
+            auto extraCharmTime = (uint32)(CharmTime * (charmModValue * 0.5f) / 10);
             CharmTime += extraCharmTime;
 
             //randomize charm time if > EM
-            if (mobCheck > EMobDifficulty::EvenMatch)
+            if (baseExp > 100)
+            {
                 CharmTime = (uint32)(CharmTime * dsprand::GetRandomNumber(0.75f, 1.25f));
+            }
 
-            if (!TryCharm(PCharmer, PVictim))
+            if (TryCharm(PCharmer, PVictim) == false)
+            {
                 return;
+            }
         }
 
         applyCharm(PCharmer, PVictim, std::chrono::milliseconds(CharmTime));
@@ -4002,19 +4033,23 @@ namespace battleutils
         //  75 with a BST SJ Lvl 75 will not - this player has bst leveled to 75 and is using it as SJ
         //---------------------------------------------------------
 
-        // Paranoid check
-        if (!PCharmer || !PTarget)
-            return 0.f;
+        float charmChance = 0.0f;
+
+        if (PCharmer == nullptr || PTarget == nullptr)
+            return charmChance;
 
         // Can the target even be charmed?
-        CMobEntity* PTargetAsMob = dynamic_cast<CMobEntity*>(PTarget);
+        auto PTargetAsMob = dynamic_cast<CMobEntity*>(PTarget);
         if (PTargetAsMob)
         {
-            // Cannot charm NMs, pets, or other non-charmable mobs
-            if (PTargetAsMob->m_Type & MOBTYPE_NOTORIOUS || !PTargetAsMob->getMobMod(MOBMOD_CHARMABLE) || PTargetAsMob->PMaster)
-                return 0.f;
+            if (PTargetAsMob->m_Type & MOBTYPE_NOTORIOUS ||
+                PTargetAsMob->getMobMod(MOBMOD_CHARMABLE) == 0 ||
+                PTargetAsMob->PMaster != nullptr)
+            {
+                // 0% chance to charm an NM, non-charmable mob, or pet
+                return charmChance;
+            }
         }
-
 
         uint8 charmerLvl = PCharmer->GetMLevel();
         uint8 targetLvl = PTarget->GetMLevel();
@@ -4022,70 +4057,78 @@ namespace battleutils
         //printf("Charmer = %s, Lvl. %u\n", PCharmer->name.c_str(), charmerLvl);
         //printf("Target = %s, Lvl. %u\n", PTarget->name.c_str(), targetLvl);
 
-        EMobDifficulty mobCheck = charutils::CheckMob(charmerLvl, targetLvl);
-        float charmChance = 0.f;
+        uint32 base = 0;
+        uint16 baseExp = charutils::GetRealExp(charmerLvl, targetLvl);
 
-        switch (mobCheck)
-        {
-        case EMobDifficulty::TooWeak:
-            charmChance = 90.f;
-            break;
-        case EMobDifficulty::IncredibyEasyPrey:
-        case EMobDifficulty::EasyPrey:
-            charmChance = 75.f;
-            break;
-        case EMobDifficulty::DecentChallenge:
-            charmChance = 60.f;
-            break;
-        case EMobDifficulty::EvenMatch:
-            charmChance = 40.f;
-            break;
-        case EMobDifficulty::Tough:
-            charmChance = 30.f;
-            break;
-        case EMobDifficulty::VeryTough:
-            charmChance = 20.f;
-            break;
-        case EMobDifficulty::IncrediblyTough:
-            charmChance = 10.f;
-            break;
-        }
+        //printf("baseExp = %u\n", baseExp);
+        if (baseExp >= 400) // IT
+            base = 90;
+        else if (baseExp >= 240) // VT
+            base = 75;
+        else if (baseExp >= 120) // T
+            base = 60;
+        else if (baseExp == 100) // EM
+            base = 40;
+        else if (baseExp >= 75) // DC
+            base = 30;
+        else if (baseExp >= 15) // EP
+            base = 20;
+        else if (baseExp == 0) // TW
+            base = 10;
 
         uint8 charmerBSTlevel = 0;
 
-        if (CCharEntity* PChar = dynamic_cast<CCharEntity*>(PCharmer))
+        if (PCharmer->objtype == TYPE_PC)
         {
-            uint8 charmerBRDlevel = PChar->jobs.job[JOB_BRD];
-            charmerBSTlevel = PChar->jobs.job[JOB_BST];
+            uint8 charmerBRDlevel = static_cast<CCharEntity*>(PCharmer)->jobs.job[JOB_BRD];
+            charmerBSTlevel = static_cast<CCharEntity*>(PCharmer)->jobs.job[JOB_BST];
             if (PCharmer->GetMJob() == JOB_BRD && charmerBRDlevel > charmerBSTlevel)
+            {
                 charmerBSTlevel = charmerBRDlevel;
-
-            charmerBSTlevel = std::min(charmerBSTlevel, charmerLvl);
+            }
+            if (charmerBSTlevel > charmerLvl)
+            {
+                charmerBSTlevel = charmerLvl;
+            }
         }
         else if (PCharmer->objtype == TYPE_MOB)
         {
             charmerBSTlevel = charmerLvl;
         }
 
-        // FIXME: Level and CHR ratios are complete guesses
-        const float levelRatio = (targetLvl - charmerBSTlevel) / 100.f;
-        charmChance *= (1.f + levelRatio);
+        //printf("base = %u\n", base);
+        charmChance = (float)base;
 
-        const float chrRatio = (PTarget->CHR() - PCharmer->CHR()) / 100.f;
-        charmChance *= (1.f + chrRatio);
+        float levelRatio = float(targetLvl) / charmerBSTlevel;
+        charmChance *= levelRatio;
+        //printf("levelRatio = %f\n", levelRatio);
+
+        float chrRatio = float(PTarget->CHR()) / PCharmer->CHR();
+        charmChance *= chrRatio;
+        //printf("chrRatio = %f\n", chrRatio);
 
         // Retail doesn't take light/apollo into account for Gauge
         if (includeCharmAffinityAndChanceMods)
         {
             // NQ elemental staves have 2 affinity, HQ have 3 affinity. Boost is 10/15% respectively so multiply by 5.
-            const float charmAffintyMods = PCharmer->getMod(Mod::LIGHT_AFFINITY_ACC) * 5.f;
-            const float charmChanceMods = (float)PCharmer->getMod(Mod::CHARM_CHANCE);
+            float charmAffintyMods = 5.f * (PCharmer->getMod(Mod::LIGHT_AFFINITY_ACC));
+            float charmChanceMods = PCharmer->getMod(Mod::CHARM_CHANCE);
 
-            charmChance *= (1.f + (charmChanceMods + charmAffintyMods) / 100.0f);
+            charmChance *= ((float)((100.0f - charmChanceMods - charmAffintyMods) / 100.0f));
         }
 
         // Cap chance at 95%
-        return std::clamp(charmChance, 0.f, 95.f);
+        if (charmChance < 5)
+            charmChance = 5;
+
+        charmChance = 100 - charmChance;
+
+        if (charmChance < 0)
+            charmChance = 0;
+        else if (charmChance > 100)
+            charmChance = 100;
+
+        return charmChance;
     }
 
     /************************************************************************
@@ -4096,7 +4139,12 @@ namespace battleutils
 
     bool TryCharm(CBattleEntity* PCharmer, CBattleEntity* PVictim)
     {
-        return GetCharmChance(PCharmer, PVictim) > dsprand::GetRandomNumber(100.f);
+        float charmChance = GetCharmChance(PCharmer, PVictim);
+
+        if (charmChance >= dsprand::GetRandomNumber(100))
+            return true;
+
+        return false;
     }
 
     void ClaimMob(CBattleEntity* PDefender, CBattleEntity* PAttacker)
@@ -4375,39 +4423,43 @@ namespace battleutils
         {
             uint16 BindBreakChance = 0; // 0-1000 (100.0%) scale. Maybe change to a float later..
             uint16 LvDiffByExp = charutils::GetRealExp(PAttacker->GetMLevel(), PDefender->GetMLevel()); // This is temp.
-            EMobDifficulty mobCheck = charutils::CheckMob(PAttacker->GetMLevel(), PDefender->GetMLevel());
 
             // Todo: replace with an actual calculated value based on level difference. Not it, Bro!
             // This entire block of conditionals should not exist. Lv diff really shouldn't be handled at the exp check level either.
             // It might not even be in sync with the check values the entire way from lv 1 to lv 99 for all we know.
-            switch (mobCheck)
+            if (LvDiffByExp >= 400) // IT
             {
-            case EMobDifficulty::TooWeak:
-            case EMobDifficulty::IncredibyEasyPrey:
-                BindBreakChance = 10;
-                break;
-
-            case EMobDifficulty::EasyPrey:
-            case EMobDifficulty::DecentChallenge:
-                BindBreakChance = 150;
-                break;
-
-            case EMobDifficulty::EvenMatch:
-                BindBreakChance = 300;
-                break;
-
-            case EMobDifficulty::Tough:
-                BindBreakChance = 750;
-                break;
-
-            case EMobDifficulty::VeryTough:
-            case EMobDifficulty::IncrediblyTough:
+                BindBreakChance = 999;
+            }
+            else if (LvDiffByExp >= 240) // VT
+            {
                 BindBreakChance = 990;
-                break;
+            }
+            else if (LvDiffByExp >= 120) // T
+            {
+                BindBreakChance = 750;
+            }
+            else if (LvDiffByExp == 100) // EM
+            {
+                BindBreakChance = 300; // Should probably be higher.
+            }
+            else if (LvDiffByExp >= 75) // DC
+            {
+                BindBreakChance = 150; // Should probably be higher.
+            }
+            else if (LvDiffByExp >= 15) // EP
+            {
+                BindBreakChance = 150;
+            }
+            else if (LvDiffByExp < 15) // Everything weaker than EP, including both TW and that tier we don't have implimented.
+            {
+                BindBreakChance = 10; // Should probably be higher than 1% and I know darn well it ain't zero.
             }
 
             if (BindBreakChance > dsprand::GetRandomNumber(1000))
+            {
                 PDefender->StatusEffectContainer->DelStatusEffect(EFFECT_BIND);
+            }
         }
     }
 

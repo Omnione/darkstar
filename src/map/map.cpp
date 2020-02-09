@@ -46,9 +46,12 @@ This file is part of DarkStar-server source code.
 #include "linkshell.h"
 #include "map.h"
 #include "mob_spell_list.h"
+#include "trust_spell_list.h"
+#include "trust_weaponskill_list.h"
 #include "packet_system.h"
 #include "party.h"
 #include "utils/petutils.h"
+#include "utils/trustutils.h"
 #include "spell.h"
 #include "time_server.h"
 #include "transport.h"
@@ -205,6 +208,7 @@ int32 do_init(int32 argc, char** argv)
     ShowStatus("do_init: loading spells");
     spell::LoadSpellList();
     mobSpellList::LoadMobSpellList();
+    trustSpellList::LoadTrustSpellList();
     autoSpell::LoadAutomatonSpellList();
     ShowMessage("\t\t\t - " CL_GREEN"[OK]" CL_RESET"\n");
 
@@ -215,10 +219,14 @@ int32 do_init(int32 argc, char** argv)
     battleutils::LoadSkillTable();
     meritNameSpace::LoadMeritsList();
     ability::LoadAbilitiesList();
+    ability::LoadTrustAbilityList();
     battleutils::LoadWeaponSkillsList();
     battleutils::LoadMobSkillsList();
+    battleutils::LoadTrustWeaponSkillsList();
+    trustWSList::LoadTrustWSList();
     battleutils::LoadSkillChainDamageModifiers();
     petutils::LoadPetList();
+    trustutils::LoadTrustList();
     mobutils::LoadCustomMods();
 
     ShowStatus("do_init: loading zones");
@@ -1006,8 +1014,6 @@ int32 map_config_default()
     map_config.msg_server_ip = "127.0.0.1";
     map_config.healing_tick_delay = 10;
     map_config.skillup_bloodpact = true;
-    map_config.anticheat_enabled = false;
-    map_config.anticheat_jail_disable = false;
     return 0;
 }
 
@@ -1340,14 +1346,6 @@ int32 map_config_read(const int8* cfgName)
         else if (strcmp(w1, "skillup_bloodpact") == 0)
         {
             map_config.skillup_bloodpact = atoi(w2);
-        }
-        else if (strcmp(w1, "anticheat_enabled") == 0)
-        {
-            map_config.anticheat_enabled = atoi(w2);
-        }
-        else if (strcmp(w1, "anticheat_jail_disable") == 0)
-        {
-            map_config.anticheat_jail_disable = atoi(w2);
         }
         else
         {

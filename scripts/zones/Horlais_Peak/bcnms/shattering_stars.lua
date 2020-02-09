@@ -37,11 +37,11 @@ function onEventFinish(player, csid, option)
         end
 
         local pjob = player:getMainJob()
-        local maatsCap = player:getCharVar("maatsCap")
+        local maatsCap = player:getVar("maatsCap")
 
-        player:setCharVar("maatDefeated", pjob)
+        player:setVar("maatDefeated", pjob)
         if bit.band(maatsCap, bit.lshift(1, pjob - 1)) ~= 1 then
-            player:setCharVar("maatsCap", bit.bor(maatsCap, bit.lshift(1, pjob - 1)))
+            player:setVar("maatsCap", bit.bor(maatsCap, bit.lshift(1, pjob - 1)))
         end
 
         player:addTitle(dsp.title.MAAT_MASHER)

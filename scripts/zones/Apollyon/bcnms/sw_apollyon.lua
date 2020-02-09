@@ -21,7 +21,7 @@ end;
 
 -- Physically entering the BCNM via bcnmEnter(bcnmid)
 function onBattlefieldEnter(player,battlefield)
-    player:setCharVar("characterLimbusKey",GetServerVariable("[SW_Apollyon]UniqueID"));
+    player:setVar("characterLimbusKey",GetServerVariable("[SW_Apollyon]UniqueID"));
     player:delKeyItem(dsp.ki.COSMOCLEANSE);
     player:delKeyItem(dsp.ki.RED_CARD);
 end;

@@ -15,7 +15,7 @@ end;
 
 function onTrigger(player,npc)
     local currentMission = player:getCurrentMission(BASTOK);
-    local missionStatus = player:getCharVar("MissionStatus");
+    local missionStatus = player:getVar("MissionStatus");
 
     if (currentMission == dsp.mission.id.bastok.THE_EMISSARY) then
         -- Bastok Mission 2-3 Part I - San d'Oria > Windurst
@@ -40,7 +40,7 @@ function onTrigger(player,npc)
         end
     -- Bastok Mission 2-3 Part II - Windurst > San d'Oria
     elseif (currentMission == dsp.mission.id.bastok.THE_EMISSARY_SANDORIA2) then
-        missionStatus = player:getCharVar("MissionStatus");
+        missionStatus = player:getVar("MissionStatus");
         if (missionStatus == 7) then
             player:startEvent(537);
         elseif (missionStatus == 9) then
@@ -59,16 +59,16 @@ end;
 function onEventFinish(player,csid,option)
 
     if (csid == 536) then
-        player:setCharVar("MissionStatus",3);
+        player:setVar("MissionStatus",3);
     elseif (csid == 543) then
         player:addMission(BASTOK,dsp.mission.id.bastok.THE_EMISSARY);
-        player:setCharVar("MissionStatus",6);
+        player:setVar("MissionStatus",6);
     elseif (csid == 537 and option == 0) then
         player:addMission(BASTOK,dsp.mission.id.bastok.THE_EMISSARY_SANDORIA2);
-        player:setCharVar("MissionStatus",8);
+        player:setVar("MissionStatus",8);
     elseif (csid == 545) then
         player:addMission(BASTOK,dsp.mission.id.bastok.THE_EMISSARY);
-        player:setCharVar("MissionStatus",11);
+        player:setVar("MissionStatus",11);
         player:addKeyItem(dsp.ki.KINDRED_REPORT);
         player:messageSpecial(ID.text.KEYITEM_OBTAINED,dsp.ki.KINDRED_REPORT);
         player:delKeyItem(dsp.ki.KINDRED_CREST);

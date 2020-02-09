@@ -33,7 +33,6 @@ function onSpellCast(caster,target,spell)
             end
             local sINT = caster:getStat(dsp.mod.INT)
             local DOT = getElementalDebuffDOT(sINT)
-            local DOTp = 0
             local effect = target:getStatusEffect(dsp.effect.BURN)
             local noeffect = false
             if (effect ~= nil) then
@@ -49,13 +48,7 @@ function onSpellCast(caster,target,spell)
                 end
                 spell:setMsg(dsp.msg.basic.MAGIC_ENFEEB)
                 local duration = math.floor(ELEMENTAL_DEBUFF_DURATION * resist)
-                duration = duration + caster:getMerit(dsp.merit.ELEMENTAL_DEBUFF_DURATION)
-
-                local mbonus = caster:getMerit(dsp.merit.ELEMENTAL_DEBUFF_EFFECT)
-                DOT = DOT + mbonus/2 -- Damage
-                DOTp = DOTp + mbonus -- Stat Enfeeb
-
-                target:addStatusEffect(dsp.effect.BURN,DOT, 3, duration, dsp.effect.BURN, DOTp)
+                target:addStatusEffect(dsp.effect.BURN,DOT, 3, ELEMENTAL_DEBUFF_DURATION)
             end
         end
     end

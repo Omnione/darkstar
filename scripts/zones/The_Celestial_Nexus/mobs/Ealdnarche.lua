@@ -49,7 +49,7 @@ function onMobDeath(mob, player, isKiller)
     DespawnMob(mob:getID()+3);
     DespawnMob(mob:getID()+4);
     local battlefield = player:getBattlefield();
-    player:startEvent(32004, battlefield:getArea());
+    player:startEvent(32004, battlefield:getBattlefieldNumber());
 end;
 
 function onEventUpdate(player,csid,option)

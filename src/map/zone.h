@@ -423,21 +423,6 @@ enum GLOBAL_MESSAGE_TYPE
     CHAR_INZONE
 };
 
-enum TELEPORT_TYPE
-{
-    TELEPORT_OUTPOST_SANDY   = 0,
-    TELEPORT_OUTPOST_BASTOK  = 1,
-    TELEPORT_OUTPOST_WINDY   = 2,
-    TELEPORT_RUNIC_PORTAL    = 3,
-    TELEPORT_PAST_MAW        = 4,
-    TELEPORT_ABBYSEA_MAW     = 5,
-    TELEPORT_CAMPAIGN_SANDY  = 6,
-    TELEPORT_CAMPAIGN_BASTOK = 7,
-    TELEPORT_CAMPAIGN_WINDY  = 8,
-    TELEPORT_HOMEPOINT       = 9,
-    TELEPORT_SURVIVAL        = 10
-};
-
 enum ZONEMISC
 {
     MISC_NONE       = 0x0000,   // Able to be used in any area
@@ -556,6 +541,7 @@ public:
     virtual void    SpawnPCs(CCharEntity* PChar);                                   // отображаем персонажей в зоне
     virtual void    SpawnMOBs(CCharEntity* PChar);                                  // отображаем MOBs в зоне
     virtual void    SpawnPETs(CCharEntity* PChar);                                  // отображаем PETs в зоне
+    virtual void    SpawnTRUSTs(CCharEntity* PChar);                                // отображаем TRUSTs в зоне
     virtual void    SpawnNPCs(CCharEntity* PChar);                                  // отображаем NPCs в зоне
     virtual void    SpawnMoogle(CCharEntity* PChar);                                // отображаем Moogle в MogHouse
     virtual void    SpawnTransport(CCharEntity* PChar);                             // отображаем транспорт
@@ -569,7 +555,9 @@ public:
     virtual void    InsertNPC(CBaseEntity* PNpc);                                   // добавляем в зону npc
     virtual void    InsertMOB(CBaseEntity* PMob);                                   // добавляем в зону mob
     virtual void    InsertPET(CBaseEntity* PPet);                                   // добавляем в зону pet
+    virtual void    InsertTRUST(CBaseEntity* PTrust);                               // добавляем в зону trust
     virtual void    DeletePET(CBaseEntity* PPet);                                   // derefs the pet's ID from this zone
+    virtual void    DeleteTRUST(CBaseEntity* PTrust);
 
     virtual void    FindPartyForMob(CBaseEntity* PEntity);                          // ищем группу для монстра
     virtual void    TransportDepart(uint16 boundary, uint16 zone);                  // транспотр отправляется, необходимо собрать пассажиров

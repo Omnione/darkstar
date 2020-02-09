@@ -17,7 +17,7 @@ function onTrigger(player,npc)
         player:startEvent(103); -- for other nation
     else
         CurrentMission = player:getCurrentMission(WINDURST);
-        MissionStatus = player:getCharVar("MissionStatus");
+        MissionStatus = player:getVar("MissionStatus");
         pRank = player:getRank();
         cs, p, offset = getMissionOffset(player,2,CurrentMission,MissionStatus);
 
@@ -62,7 +62,7 @@ printf("RESULT: %u",option);
         player:messageSpecial(ID.text.KEYITEM_OBTAINED,dsp.ki.STAR_CRESTED_SUMMONS);
     end
     if (csid == 837) then
-        player:setCharVar("WWatersRTenText",1);
+        player:setVar("WWatersRTenText",1);
     end
     
 end;

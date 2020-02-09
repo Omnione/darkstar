@@ -14,6 +14,10 @@ function onMobInitialize(mob)
 end
 
 function onMobSpawn(mob)
+    local mobId = mob:getID()
+    local offset = (mobId - ID.mob.HEAVY_METAL_CRAB_OFFSET) % 4
+    mob:setMobMod(dsp.mobMod.SUPERLINK, GetMobByID(mobId - offset):getShortID())
+
     if VanadielDayElement() == dsp.day.WATERSDAY then
         mob:setMod(dsp.mod.REGEN, 6, 3, 0)
     end

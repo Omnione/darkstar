@@ -6,19 +6,15 @@
 -----------------------------------
 local ID = require("scripts/zones/Windurst_Waters/IDs")
 require("scripts/globals/shop")
-require("scripts/globals/crafting")
-require("scripts/globals/settings")
-require("scripts/globals/status")
 -----------------------------------
 
 function onTrade(player,npc,trade)
-end
+end;
 
 function onTrigger(player,npc)
-    local guildRank = player:getSkillRank(dsp.skill.COOKING)
-    local stock = dsp.shop.generalGuildStock[guild.cooking]
-    dsp.shop.generalGuild(player, stock, guildRank)
-    player:showText(npc,ID.text.CHOMOJINJAHL_SHOP_DIALOG)
+    if player:sendGuild(5302,5,20,7) then
+        player:showText(npc,ID.text.CHOMOJINJAHL_SHOP_DIALOG)
+    end
 end
 
 function onEventUpdate(player,csid,option)

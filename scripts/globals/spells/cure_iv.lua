@@ -56,7 +56,7 @@ function onSpellCast(caster,target,spell)
             basepower = 0
         end
     end
-    if (target:getAllegiance() == caster:getAllegiance() and (target:getObjType() == dsp.objType.PC or target:getObjType() == dsp.objType.MOB)) then
+    if (target:getAllegiance() == caster:getAllegiance() and (target:getObjType() == dsp.objType.PC or target:getObjType() == dsp.objType.MOB or target:getObjType() == dsp.objType.TRUST)) then
         if (USE_OLD_CURE_FORMULA == true) then
             basecure = getBaseCureOld(power,divisor,constant)
         else
@@ -73,9 +73,6 @@ function onSpellCast(caster,target,spell)
             else
                 solaceStoneskin = math.floor(final * 0.25)
             end
-
-            solaceStoneskin = solaceStoneskin * (1 + caster:getMerit(dsp.merit.ANIMUS_SOLACE)/100)
-
             target:addStatusEffect(dsp.effect.STONESKIN,solaceStoneskin,0,25,0,0,1)
         end
         final = final + (final * (target:getMod(dsp.mod.CURE_POTENCY_RCVD)/100))

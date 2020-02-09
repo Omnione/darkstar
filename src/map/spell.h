@@ -68,10 +68,9 @@ enum SPELLAOE
 
 enum SPELLFLAG
 {
-    SPELLFLAG_NONE           = 0x00,
-    SPELLFLAG_HIT_ALL        = 0x01, // Hit all targets in range regardless of party
-    SPELLFLAG_WIPE_SHADOWS   = 0x02, // Wipe shadows even if single target and miss/resist (example: "Maiden's Virelai")
-    SPELLFLAG_IGNORE_SHADOWS = 0x04  // Ignore shadows and hit player anyways (example: Mobs "Death" spell)
+    SPELLFLAG_NONE          = 0x00,
+    SPELLFLAG_HIT_ALL       = 0x01, // Hit all targets in range regardless of party
+    SPELLFLAG_WIPE_SHADOWS  = 0x02  // Wipe shadows even if single target and miss/resist (example: Maiden's Virelai)
 };
 
 enum class SpellID : uint16
@@ -793,6 +792,7 @@ public:
     bool        tookEffect(); // returns true if the spell landed, not resisted or missed
     bool        hasMPCost(); // checks if spell costs mp to use
     bool        isHeal(); // is a heal spell
+    bool        isDebuff(); // is a debuff spell
     bool        isCure(); // is a Cure spell
     bool        isNa(); // is a -na spell
     bool        canHitShadow(); // check if spell ignores shadows
@@ -875,6 +875,7 @@ namespace spell
     bool    CanUseSpell(CBattleEntity* PCaster, CSpell* PSpell);
     bool    CanUseSpellWith(SpellID spellId, JOBTYPE job, uint8 level);
     float   GetSpellRadius(CSpell* spellId, CBattleEntity* PCaster);
+    uint32   GetEnfeebleEffect(CSpell* spellId);
 };
 
 #endif

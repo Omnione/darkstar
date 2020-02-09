@@ -91,25 +91,18 @@ struct expChain_t
     uint32 chainTime;
 };
 
-struct Telepoint_t
+struct NationTP_t
 {
-    uint32 access[4];
-    int32  menu[10];
+    uint32		sandoria;
+    uint32		bastok;
+    uint32		windurst;
+    uint32		ahturhgan;
+    uint32		maw;
+    uint32		pastsandoria;
+    uint32		pastbastok;
+    uint32		pastwindurst;
 };
 
-struct Teleport_t
-{
-    uint32		outpostSandy;
-    uint32		outpostBastok;
-    uint32		outpostWindy;
-    uint32		runicPortal;
-    uint32		pastMaw;
-    uint32		campaignSandy;
-    uint32		campaignBastok;
-    uint32		campaignWindy;
-    Telepoint_t homepoint;
-    Telepoint_t survival;
-};
 
 struct PetInfo_t
 {
@@ -210,10 +203,11 @@ public:
     void					setPetZoningInfo();				// set pet zoning info (when zoning and logging out)
     void					resetPetZoningInfo();			// reset pet zoning info (when changing job ect)
     uint8					m_SetBlueSpells[20];			// The 0x200 offsetted blue magic spell IDs which the user has set. (1 byte per spell)
+    uint16                  m_lastWSused;
 
     UnlockedAttachments_t	m_unlockedAttachments;			// Unlocked Automaton Attachments (1 bit per attachment)
     CAutomatonEntity*       PAutomaton;                     // Automaton statistics
-
+    
     std::vector<CTrustEntity*> PTrusts; // Active trusts
 
 
@@ -227,8 +221,8 @@ public:
 
     // TODO: половина этого массива должна храниться в char_vars, а не здесь, т.к. эта информация не отображается в интерфейсе клиента и сервер не проводит с ними никаких операций
 
-    //currency_t        m_currency;                 // conquest points, imperial standing points etc
-    Teleport_t	      teleport;					    // Outposts, Runic Portals, Homepoints, Survival Guides, Maws, etc
+    //currency_t        m_currency;                   // conquest points, imperial standing points etc
+    NationTP_t		  nationtp;						// supply tp, runic portal, campaign tp,...
 
     uint8             GetGender();                  // узнаем пол персонажа
 
@@ -264,6 +258,7 @@ public:
     SpawnIDList_t	  SpawnMOBList;					// список видимых монстров
     SpawnIDList_t	  SpawnPETList;					// список видимых питомцев
     SpawnIDList_t	  SpawnNPCList;					// список видимых npc
+    SpawnIDList_t	  SpawnTRUSTList;					// список видимых монстров
 
     void			  SetName(int8* name);			// устанавливаем имя персонажа (имя ограничивается 15-ю символами)
 
@@ -310,6 +305,7 @@ public:
     bool              m_EquipSwap;					// true if equipment was recently changed
     bool              m_EffectsChanged;
     time_point        m_LastSynthTime;
+    time_point        m_LastPartyTime;
 
     int16 addTP(int16 tp) override;
     int32 addHP(int32 hp) override;
@@ -328,6 +324,7 @@ public:
     bool        ReloadParty();
     void        ClearTrusts();
     void        RemoveTrust(CTrustEntity*);
+    uint8       TrustPartyPosition(CTrustEntity* PTrust);
 
     virtual void Tick(time_point) override;
     void        PostTick() override;

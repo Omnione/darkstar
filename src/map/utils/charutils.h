@@ -35,23 +35,6 @@ class CMobEntity;
 class CMeritPoints;
 class CAbility;
 
-/**
- * @enum EMobDifficulty
- * @brief Order matters for /check message packet
- */
-enum class EMobDifficulty : uint8
-{
-    TooWeak = 0,
-    IncredibyEasyPrey,
-    EasyPrey,
-    DecentChallenge,
-    EvenMatch,
-    Tough,
-    VeryTough,
-    IncrediblyTough,
-    MAX
-};
-
 namespace charutils
 {
 
@@ -70,16 +53,14 @@ namespace charutils
 
     void	SetLevelRestriction(CCharEntity* PChar, uint8 lvl);
 
-    EMobDifficulty CheckMob(uint8 charlvl, uint8 moblvl);
-
-    uint32	GetRealExp(uint8 charlvl, uint8 moblvl);
     uint32	GetExpNEXTLevel(uint8 charlvl);
+    uint32	GetRealExp(uint8 charlvl, uint8 moblvl);
 
     void	DelExperiencePoints(CCharEntity* PChar, float retainpct, uint16 forcedXpLoss);
     void	DistributeExperiencePoints(CCharEntity* PChar, CMobEntity* PMob);
     void	DistributeGil(CCharEntity* PChar, CMobEntity* PMob);
     void	DistributeItem(CCharEntity* PChar, CBaseEntity* PEntity, uint16 itemid, uint16 droprate);
-    void	AddExperiencePoints(bool expFromRaise, CCharEntity* PChar, CBaseEntity* PMob, uint32 exp, EMobDifficulty mobCheck = EMobDifficulty::TooWeak, bool isexpchain = false);
+    void	AddExperiencePoints(bool expFromRaise, CCharEntity* PChar, CBaseEntity* PMob, uint32 exp, uint32 baseexp = 0, bool isexpchain = false);
 
     void	TrySkillUP(CCharEntity* PChar, SKILLTYPE SkillID, uint8 lvl);
     void	BuildingCharSkillsTable(CCharEntity* PChar);
@@ -135,7 +116,7 @@ namespace charutils
     int32   delTitle(CCharEntity* PChar, uint16 Title);
     void   setTitle(CCharEntity* PChar, uint16 Title); // set title if not, save and update player
 
-    int32	hasPetAbility(CCharEntity* PChar, uint16 AbilityID);	    //same as Ability but for pet commands (e.g. Healing Ruby)
+    int32	hasPetAbility(CCharEntity* PChar, uint16 AbilityID);	        //same as Ability but for pet commands (e.g. Healing Ruby)
     int32	addPetAbility(CCharEntity* PChar, uint16 AbilityID);
     int32	delPetAbility(CCharEntity* PChar, uint16 AbilityID);
 
@@ -158,19 +139,19 @@ namespace charutils
     void	SaveZonesVisited(CCharEntity* PChar);				        // сохраняем посещенные зоны
     void	SaveKeyItems(CCharEntity* PChar);					        // сохраняем ключевые предметы
     void	SaveCharInventoryCapacity(CCharEntity* PChar);              // Save Character inventory capacity
-    void	SaveSpell(CCharEntity* PChar, uint16 spellID);				// сохраняем выученные заклинания
+    void	SaveSpell(CCharEntity* PChar, uint16 spellID);						        // сохраняем выученные заклинания
     void	DeleteSpell(CCharEntity* PChar, uint16 spellID);
     void	SaveLearnedAbilities(CCharEntity* PChar);					// saved learned abilities (corsair rolls)
     void    SaveTitles(CCharEntity* PChar);						        // сохраняем заслуженные звания
     void	SaveCharStats(CCharEntity* PChar);					        // сохраняем флаги, текущие значения жихней, маны и профессий
     void    SaveCharGMLevel(CCharEntity* PChar);                        // saves the char's gm level and nameflags
     void    SaveMentorFlag(CCharEntity* PChar);                         // saves the char's mentor flag
-    void    SaveMenuConfigFlags(CCharEntity* PChar);                    // saves the char's unnamed flags
+    void    SaveMenuConfigFlags(CCharEntity* PChar);                       // saves the char's unnamed flags
     void	SaveCharNation(CCharEntity* PChar);							// Save the character's nation of allegiance.
     void    SaveCampaignAllegiance(CCharEntity* PChar);                 // Save the character's campaign allegiance.
     void	SaveCharMoghancement(CCharEntity* PChar);                   // Save the character's current moghancement
     void	SaveCharSkills(CCharEntity* PChar, uint8 skillID);	        // сохраняем указанный skill персонажа
-    void    SaveTeleport(CCharEntity* PChar, uint8 type);               // Homepoints, outposts, etc
+    void    SaveCharUnlocks(CCharEntity* PChar);                        // Nation teleports, etc
     void	SaveDeathTime(CCharEntity* PChar);							// Saves when this character last died.
     void	SavePlayTime(CCharEntity* PChar);							// Saves this characters total play time.
     bool	hasMogLockerAccess(CCharEntity* PChar);						// true if have access, false otherwise.
@@ -203,7 +184,7 @@ namespace charutils
     void    HomePoint(CCharEntity* PChar);
     bool    AddWeaponSkillPoints(CCharEntity*, SLOTTYPE, int);
 
-    int32   GetCharVar(CCharEntity* PChar, const char* var);
+    int32   GetVar(CCharEntity* PChar, const char* var);
 };
 
 #endif

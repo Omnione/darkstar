@@ -8,7 +8,7 @@ function onTrade(player,npc,trade)
 end
 
 function onTrigger(player,npc)
-    local promotion = player:getCharVar("AssaultPromotion")
+    local promotion = player:getVar("AssaultPromotion")
     local rank = 0
     
     if promotion <= 7 then

@@ -42,7 +42,7 @@ ThePromise = player:getQuestStatus(WINDURST,dsp.quest.id.windurst.THE_PROMISE);
     elseif (KnowOnesOnions == QUEST_COMPLETED) then
         player:startEvent(411);
     elseif (KnowOnesOnions == QUEST_ACCEPTED) then
-        KnowOnesOnionsVar  = player:getCharVar("KnowOnesOnions");
+        KnowOnesOnionsVar  = player:getVar("KnowOnesOnions");
 
         if (KnowOnesOnionsVar == 2) then
             player:startEvent(410);

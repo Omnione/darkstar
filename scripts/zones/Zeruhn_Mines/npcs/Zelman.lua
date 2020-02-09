@@ -12,7 +12,7 @@ function onTrade(player,npc,trade)
 end
 
 function onTrigger(player,npc)
-    local groceries = player:getCharVar("Groceries")
+    local groceries = player:getVar("Groceries")
 
     -- GROCERIES
     if groceries == 1 then
@@ -36,10 +36,10 @@ end
 function onEventFinish(player,csid,option)
     -- GROCERIES
     if csid == 161 then
-        player:setCharVar("Groceries", 2)
+        player:setVar("Groceries", 2)
         player:delKeyItem(dsp.ki.TAMIS_NOTE)
     elseif csid == 162 then
-        player:setCharVar("Groceries", 3)
+        player:setVar("Groceries", 3)
         player:delKeyItem(dsp.ki.TAMIS_NOTE)
     end
 end
