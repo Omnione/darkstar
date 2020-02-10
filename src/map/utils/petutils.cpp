@@ -1237,59 +1237,6 @@ namespace petutils
 
     void SpawnTrust(CCharEntity* PMaster, uint32 TrustID)
     {
-        // TODO: You can only spawn trusts in battle areas, similar to pets. See MSGBASIC_TRUST_NOT_HERE
-
-        // TODO: There is an expandable limit of trusts you can summon, based on key items.
-        size_t maxTrusts = 5;
-
-        // TODO: These checks should be done at before spellcast time!!
-        // If you're in a party, you can only spawn trusts if:
-        //  * You're the party leader
-        //  * The party isn't full
-        //  * The party isn't part of an alliance
-        if (PMaster->PParty != nullptr)
-        {
-            CBattleEntity* PLeader = PMaster->PParty->GetLeader();
-            if (PLeader == nullptr || PLeader->id != PMaster->id)
-            {
-                PMaster->pushPacket(new CMessageStandardPacket(PMaster, 0, MsgStd::TrustSoloOrLeader));
-                return;
-            }
-            if (PMaster->PParty->members.size() >= 6)
-            {
-                PMaster->pushPacket(new CMessageStandardPacket(PMaster, 0, MsgStd::TrustLimit));
-                return;
-            }
-            if (PMaster->PParty->m_PAlliance != nullptr)
-            {
-                PMaster->pushPacket(new CMessageStandardPacket(PMaster, 0, MsgStd::TrustSoloOrLeader));
-                return;
-            }
-
-            // Reduce the max number of summonable trusts
-            maxTrusts = 6 - PMaster->PParty->members.size();
-        }
-
-        if (PMaster->PTrusts.size() >= maxTrusts)
-        {
-            PMaster->pushPacket(new CMessageStandardPacket(PMaster, 0, MsgStd::TrustLimit));
-            return;
-        }
-
-        // You can't spawn the same trust twice
-        // TODO: This includes otherwise distinct trusts, e.g. Shantotto and Shantotto II, only 1 can be called.
-        //       It'd probably be "good enough" to use the name as a heuristic, looking for "II" (this catches 99% of them).
-        for (auto PTrust : PMaster->PTrusts)
-        {
-            if (PTrust->m_TrustID == TrustID)
-            {
-                PMaster->pushPacket(new CMessageStandardPacket(PMaster, 0, MsgStd::TrustSame));
-                return;
-            }
-        }
-
-        // Make a new party if we weren't in one.
-        // TODO: It's actually not a real party: /sea shows your name as grey not yellow, but it shows as a party on the GUI.
         if (PMaster->PParty == nullptr)
         {
             PMaster->PParty = new CParty(PMaster);
@@ -1298,7 +1245,7 @@ namespace petutils
         CTrustEntity* PTrust = LoadTrust(PMaster, TrustID);
         PMaster->PTrusts.insert(PMaster->PTrusts.end(), PTrust);
         PMaster->StatusEffectContainer->CopyConfrontationEffect(PTrust);
-        PMaster->loc.zone->InsertPET(PTrust);
+        PMaster->loc.zone->InsertTRUST(PTrust);
         PMaster->PParty->ReloadParty();
     }
 
@@ -1950,7 +1897,7 @@ namespace petutils
         PTrust->m_OwnerID.targid = PMaster->targid;
 
         // spawn me randomly around master
-        PTrust->loc.p = nearPosition(PMaster->loc.p, CTrustController::RoamDistance, (float)M_PI);
+        PTrust->loc.p = nearPosition(PMaster->loc.p, CTrustController::SpawnDistance, (float)M_PI);
         PTrust->look = trustData->look;
         PTrust->name = trustData->name;
         PTrust->m_name_prefix = trustData->name_prefix;
@@ -2062,6 +2009,34 @@ namespace petutils
         else
         {
             return true;
+        }
+        return false;
+    }
+
+    bool CheckTrustName(const char* name, uint32 trustID)
+    {
+        printf("Trusts name = %s", name);
+
+        const char* Query =
+            "SELECT \
+                 mob_pools.name \
+                 FROM mob_pools \
+                 WHERE mob_pools.poolid = %u";
+
+        uint32 ret = Sql_Query(SqlHandle, Query, trustID +5000);
+
+        if (ret != SQL_ERROR && Sql_NumRows(SqlHandle) != 0)
+        {
+            while (Sql_NextRow(SqlHandle) == SQL_SUCCESS)
+            {
+                const char* sqlName = (const char*)Sql_GetData(SqlHandle, 0);
+
+                if (name == sqlName)
+                {
+                    printf("sqlName name is the same as %s, should not spawn this trust!", sqlName);
+                    return true;
+                }
+            }
         }
         return false;
     }

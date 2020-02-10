@@ -650,7 +650,12 @@ void SmallPacket0x01A(map_session_data_t* session, CCharEntity* PChar, CBasicPac
         CBaseEntity* PTrust = PChar->GetEntity(TargID, TYPE_TRUST);
         if (PTrust != nullptr)
         {
+            printf("PTrust not null");
             PChar->RemoveTrust((CTrustEntity*)PTrust);
+        }
+        else
+        {
+            printf("PTrust is null");
         }
 
         if (PChar->m_event.EventID == -1)

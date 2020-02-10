@@ -2515,6 +2515,62 @@ INSERT INTO `mob_spell_lists` VALUES ('Ghul-I-Beaban_BLM',305,174,1,255); -- fir
 INSERT INTO `mob_spell_lists` VALUES ('Ghul-I-Beaban_BLM',305,179,1,255); -- blizzaga
 INSERT INTO `mob_spell_lists` VALUES ('Saa_Doyi_the_Fervid',306,320,1,255); -- katon_ichi
 INSERT INTO `mob_spell_lists` VALUES ('Frost_Flambeau',307,180,1,255); -- blizzaga_ii
+-- Trust
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,159,1,255);  -- Stone
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,160,26,255); -- Stone II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,161,51,255); -- Stone III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,162,68,255); -- Stone IV
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,163,77,255); -- Stone V
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,169,5,255);  -- Water
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,170,30,255); -- Water II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,171,55,255); -- Water III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,172,70,255); -- Water IV
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,173,80,255); -- Water V
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,154,9,255);  -- Aero
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,155,34,255); -- Aero II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,156,59,255); -- Aero III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,157,72,255); -- Aero IV
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,158,83,255); -- Aero V
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,144,9,255);  -- Fire
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,145,34,255); -- Fire II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,146,59,255); -- Fire III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,147,72,255); -- Fire IV
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,148,83,255); -- Fire V
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,149,9,255);  -- Blizzard
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,150,34,255); -- Blizzard II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,151,59,255); -- Blizzard III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,152,72,255); -- Blizzard IV
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Shantotto',308,153,83,255); -- Blizzard V
+
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,1,1,255);       -- Cure
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,2,11,255);      -- Cure II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,3,21,255);      -- Cure III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,4,41,255);      -- Cure IV
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,5,61,255);      -- Cure V
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,6,80,255);      -- Cure VI
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,125,7,255);     -- Protectra
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,126,27,255);    -- Protectra II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,127,47,255);    -- Protectra III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,128,63,255);    -- Protectra IV
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,129,75,255);    -- Protectra V
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,130,17,255);    -- Shellra
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,131,37,255);    -- Shellra II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,132,57,255);    -- Shellra III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,133,68,255);    -- Shellra IV
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,134,75,255);    -- Shellra V
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,143,32,255);    -- Erase
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,58,6,255);      -- Paralyze
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,56,13,255);     -- Slow
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Kupipi',309,112,45,255);    -- Flash
+
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Excenmille',310,1,5,255);   -- Cure
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Excenmille',310,2,17,255);  -- Cure II
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Excenmille',310,3,30,255);  -- Cure III
+INSERT INTO `mob_spell_lists` VALUES ('TRUST_Excenmille',310,4,55,255);  -- Cure IV
+
+
+
+
 
 /*!40000 ALTER TABLE `mob_spell_lists` ENABLE KEYS */;
 UNLOCK TABLES;

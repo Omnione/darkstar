@@ -266,6 +266,7 @@ void do_final(int code)
     battleutils::FreeMobSkillList();
 
     petutils::FreePetList();
+    petutils::FreeTrustList();
     zoneutils::FreeZoneList();
     luautils::free();
     message::close();

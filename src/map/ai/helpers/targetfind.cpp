@@ -26,6 +26,7 @@ This file is part of DarkStar-server source code.
 #include <math.h>
 #include "../../entities/charentity.h"
 #include "../../entities/mobentity.h"
+#include "../../entities/trustentity.h"
 #include "../../packets/action.h"
 #include "../../alliance.h"
 #include "../../../common/mmo.h"
@@ -246,6 +247,24 @@ void CTargetFind::addAllInParty(CBattleEntity* PTarget, bool withPet)
 
     PTarget->ForParty([this, withPet](CBattleEntity* PMember)
     {
+        
+        // add my Trust too because why not?
+        if (PMember->objtype == TYPE_PC)
+        {
+            CCharEntity* PChar = (CCharEntity*)PMember;
+
+            if (PChar->PTrusts.size() > 0)
+            {
+                uint32 index = 0;
+                for (index; index < PChar->PTrusts.size(); index++)
+                {
+                    CTrustEntity* trust = PChar->PTrusts.at(index);
+                    CBattleEntity* PTrust = static_cast<CBattleEntity*>(trust);
+                    m_targets.push_back(PTrust);
+                }
+            }
+        }
+        
         addEntity(PMember, withPet);
     });
 
@@ -280,7 +299,6 @@ void CTargetFind::addEntity(CBattleEntity* PTarget, bool withPet)
     {
         m_targets.push_back(PTarget->PPet);
     }
-
 }
 
 CBattleEntity* CTargetFind::findMaster(CBattleEntity* PTarget)
@@ -465,7 +483,7 @@ bool CTargetFind::canSee(position_t* point)
 
 CBattleEntity* CTargetFind::getValidTarget(uint16 actionTargetID, uint16 validTargetFlags)
 {
-    CBattleEntity* PTarget = (CBattleEntity*)m_PBattleEntity->GetEntity(actionTargetID, TYPE_MOB | TYPE_PC | TYPE_PET);
+    CBattleEntity* PTarget = (CBattleEntity*)m_PBattleEntity->GetEntity(actionTargetID, TYPE_MOB | TYPE_PC | TYPE_PET | TYPE_TRUST);
 
     if (PTarget == nullptr)
     {
@@ -475,6 +493,11 @@ CBattleEntity* CTargetFind::getValidTarget(uint16 actionTargetID, uint16 validTa
     if (validTargetFlags & TARGET_PET)
     {
         return m_PBattleEntity->PPet;
+    }
+
+    if (PTarget->objtype == TYPE_TRUST)
+    {
+        return PTarget;
     }
 
     if (PTarget->ValidTarget(m_PBattleEntity, validTargetFlags))

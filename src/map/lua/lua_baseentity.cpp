@@ -80,6 +80,7 @@
 #include "../entities/mobentity.h"
 #include "../entities/npcentity.h"
 #include "../entities/petentity.h"
+#include "../entities/trustentity.h"
 
 #include "../packets/action.h"
 #include "../packets/auction_house.h"
@@ -11820,6 +11821,100 @@ inline int32 CLuaBaseEntity::spawnPet(lua_State *L)
 }
 
 /************************************************************************
+*  Function: canCastTrust()
+*  Purpose : checks if player can cast trust
+*  Example : 
+*  Notes   :
+************************************************************************/
+
+inline int32 CLuaBaseEntity::canCastTrust(lua_State* L)
+{
+    DSP_DEBUG_BREAK_IF(m_PBaseEntity == nullptr);
+    DSP_DEBUG_BREAK_IF(m_PBaseEntity->objtype != TYPE_PC);
+
+    // TODO: You can only spawn trusts in battle areas, similar to pets. See MSGBASIC_TRUST_NOT_HERE
+    // TODO: There is an expandable limit of trusts you can summon, based on key items.
+
+    if (!lua_isnil(L, 1) && lua_isstring(L, 1))
+    {
+        size_t maxTrusts = 5;
+        uint16 trustId = (uint16)lua_tointeger(L, 1);
+        CCharEntity* PChar = (CCharEntity*)m_PBaseEntity;
+
+        // If you're in a party, you can only spawn trusts if:
+        //  * You're the party leader
+        //  * The party isn't full
+        //  * The party isn't part of an alliance
+        if (PChar->PParty != nullptr)
+        {
+            CBattleEntity* PLeader = PChar->PParty->GetLeader();
+            if (PLeader == nullptr || PLeader->id != PChar->id)
+            {
+                PChar->pushPacket(new CMessageStandardPacket(PChar, 0, MsgStd::TrustSoloOrLeader));
+                lua_pushboolean(L, false);
+                return 1;
+            }
+            if (PChar->PParty->members.size() >= 6)
+            {
+                PChar->pushPacket(new CMessageStandardPacket(PChar, 0, MsgStd::TrustLimit));
+                lua_pushboolean(L, false);
+                return 1;
+            }
+            if (PChar->PParty->m_PAlliance != nullptr)
+            {
+                PChar->pushPacket(new CMessageStandardPacket(PChar, 0, MsgStd::TrustSoloOrLeader));
+                lua_pushboolean(L, false);
+                return 1;
+            }
+
+            // Reduce the max number of summonable trusts
+            maxTrusts = 6 - PChar->PParty->members.size();
+        }
+
+        if (PChar->PTrusts.size() >= maxTrusts)
+        {
+            PChar->pushPacket(new CMessageStandardPacket(PChar, 0, MsgStd::TrustLimit));
+            lua_pushboolean(L, false);
+            return 1;
+        }
+
+        // You can't spawn the same trust twice
+        // TODO: This includes otherwise distinct trusts, e.g. Shantotto and Shantotto II, only 1 can be called.
+        //       It'd probably be "good enough" to use the name as a heuristic, looking for "II" (this catches 99% of them).
+        
+
+        if (PChar->PTrusts.size() > 0)
+        {
+            for (auto PTrust : PChar->PTrusts)
+            {
+                if (PTrust->m_TrustID == trustId)
+                {
+                    PChar->pushPacket(new CMessageStandardPacket(PChar, 0, MsgStd::TrustSame));
+                    lua_pushboolean(L, false);
+                    return 1;
+                }
+            }
+
+            uint32 index = 0;
+            for (index; index < PChar->PTrusts.size(); index++)
+            {
+                if (petutils::CheckTrustName(PChar->PTrusts.at(index)->name.c_str(), trustId) == true)
+                {
+                    PChar->pushPacket(new CMessageStandardPacket(PChar, 0, MsgStd::TrustSame));
+                    lua_pushboolean(L, false);
+                    return 1;
+                }
+            }
+        }
+        
+
+        lua_pushboolean(L, true);
+        return 1;
+    }
+    return 0;
+}
+
+/************************************************************************
 *  Function: spawnTrust()
 *  Purpose : Spawns a Trust if a few correct conditions are met
 *  Example : caster:spawnTrust(TRUST_SHANTOTTO)
@@ -14476,8 +14571,9 @@ Lunar<CLuaBaseEntity>::Register_t CLuaBaseEntity::methods[] =
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,removeOldestManeuver),
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,removeAllManeuvers),
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,updateAttachments),
-
-    LUNAR_DECLARE_METHOD(CLuaBaseEntity, spawnTrust),
+        
+    LUNAR_DECLARE_METHOD(CLuaBaseEntity,canCastTrust),
+    LUNAR_DECLARE_METHOD(CLuaBaseEntity,spawnTrust),
 
     // Mob Entity-Specific
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,setMobLevel),

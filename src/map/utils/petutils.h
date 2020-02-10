@@ -86,6 +86,7 @@ namespace petutils
     void LoadWyvernStatistics(CBattleEntity* PMaster, CPetEntity* PPet, bool finalize);
     void FinalizePetStatistics(CBattleEntity* PMaster, CPetEntity* PPet);
     bool CheckPetModType(CBattleEntity* PPet, PetModType petmod);
+    bool CheckTrustName(const char* name, uint32 trustID);
     void QueryTrust(uint32 TrustID);
     CTrustEntity* LoadTrust(CCharEntity* PMaster, uint32 TrustID);
 };

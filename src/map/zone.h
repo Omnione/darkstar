@@ -557,6 +557,7 @@ public:
     virtual void    SpawnMOBs(CCharEntity* PChar);                                  // отображаем MOBs в зоне
     virtual void    SpawnPETs(CCharEntity* PChar);                                  // отображаем PETs в зоне
     virtual void    SpawnNPCs(CCharEntity* PChar);                                  // отображаем NPCs в зоне
+    virtual void    SpawnTRUSTs(CCharEntity* PChar);                                // отображаем TRUSTs в зоне
     virtual void    SpawnMoogle(CCharEntity* PChar);                                // отображаем Moogle в MogHouse
     virtual void    SpawnTransport(CCharEntity* PChar);                             // отображаем транспорт
     void            SavePlayTime();
@@ -569,7 +570,10 @@ public:
     virtual void    InsertNPC(CBaseEntity* PNpc);                                   // добавляем в зону npc
     virtual void    InsertMOB(CBaseEntity* PMob);                                   // добавляем в зону mob
     virtual void    InsertPET(CBaseEntity* PPet);                                   // добавляем в зону pet
+    virtual void    InsertTRUST(CBaseEntity* PTrust);                               // Add a trust to the zone
+
     virtual void    DeletePET(CBaseEntity* PPet);                                   // derefs the pet's ID from this zone
+    virtual void    DeleteTRUST(CBaseEntity* PTrust);
 
     virtual void    FindPartyForMob(CBaseEntity* PEntity);                          // ищем группу для монстра
     virtual void    TransportDepart(uint16 boundary, uint16 zone);                  // транспотр отправляется, необходимо собрать пассажиров

@@ -478,7 +478,6 @@ void CCharEntity::RemoveTrust(CTrustEntity* PTrust)
         return;
 
     auto trustIt = std::remove_if(PTrusts.begin(), PTrusts.end(), [PTrust](auto trust) { return PTrust == trust; });
-
     if (trustIt != PTrusts.end())
     {
         PTrust->PAI->Despawn();

@@ -443,6 +443,22 @@ void CZone::InsertPET(CBaseEntity* PPet)
 
 /************************************************************************
 *                                                                       *
+*  Add a trust to the zone                                              *
+*                                                                       *
+************************************************************************/
+
+void CZone::InsertTRUST(CBaseEntity* PTrust)
+{
+    m_zoneEntities->InsertTRUST(PTrust);
+}
+
+void CZone::DeleteTRUST(CBaseEntity* PTrust)
+{
+    m_zoneEntities->DeleteTRUST(PTrust);
+}
+
+/************************************************************************
+*                                                                       *
 *  Добавляем в зону активную область                                    *
 *                                                                       *
 ************************************************************************/
@@ -652,6 +668,11 @@ void CZone::SpawnMOBs(CCharEntity* PChar)
 void CZone::SpawnPETs(CCharEntity* PChar)
 {
     m_zoneEntities->SpawnPETs(PChar);
+}
+
+void CZone::SpawnTRUSTs(CCharEntity* PChar)
+{
+    m_zoneEntities->SpawnTRUSTs(PChar);
 }
 
 /************************************************************************
